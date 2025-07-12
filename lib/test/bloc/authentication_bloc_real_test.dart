@@ -42,30 +42,29 @@ void main() async {
         final email = 'hhhhhmod0@gmail.com';
         final newPassword = 'mh0937334252';
 
-    //     print('\n📨 إرسال طلب كود تحقق إلى $email...');
-    //     bloc.add(RequstResetCodeRequested(email: email));
-    //       await expectLater(
-    //       bloc.stream,
-    //       emitsInOrder([
-    //         isA<AuthLoading>(),
-    //         isA<AuthCodeRequestedSuccess>(),
-    //       ]),
-    //     );
-    //     print('📤 تم إرسال الحدث إلى bloc');
-    //  print('📌 الحالة الحالية بعد طلب الكود: ${bloc.state}');
-        
+        //     print('\n📨 إرسال طلب كود تحقق إلى $email...');
+        //     bloc.add(RequstResetCodeRequested(email: email));
+        //       await expectLater(
+        //       bloc.stream,
+        //       emitsInOrder([
+        //         isA<AuthLoading>(),
+        //         isA<AuthCodeRequestedSuccess>(),
+        //       ]),
+        //     );
+        //     print('📤 تم إرسال الحدث إلى bloc');
+        //  print('📌 الحالة الحالية بعد طلب الكود: ${bloc.state}');
 
-    //     await Future.delayed(Duration(seconds: 1));
+        //     await Future.delayed(Duration(seconds: 1));
 
-    //     // ✅ قراءة الكود يدويًا من الـ Terminal
-    //     stdout.write('📥 من فضلك أدخل كود التحقق الذي وصلك بالإيميل: ');
-    //     String? enteredCode = stdin.readLineSync();
+        //     // ✅ قراءة الكود يدويًا من الـ Terminal
+        //     stdout.write('📥 من فضلك أدخل كود التحقق الذي وصلك بالإيميل: ');
+        //     String? enteredCode = stdin.readLineSync();
 
-    //     if (enteredCode == null || enteredCode.isEmpty) {
-    //       throw Exception('❌ لم يتم إدخال كود التحقق.');
-    //     }
+        //     if (enteredCode == null || enteredCode.isEmpty) {
+        //       throw Exception('❌ لم يتم إدخال كود التحقق.');
+        //     }
 
-    //     print('✅ تم إدخال الكود: $enteredCode');
+        //     print('✅ تم إدخال الكود: $enteredCode');
 
         // 2️⃣ التحقق من الكود
         bloc.add(VerifyResetCodeRequested(code: "794110"));
@@ -191,72 +190,69 @@ void main() async {
   });
 }
 
+// // ✅ تحقق كود صحيح
+// blocTest<AuthenticationBloc, AuthenticationState>(
+//   '🟢 تحقق كود صحيح',
+//   build: () => authBloc,
+//   act: (bloc) => bloc.add(VerifyResetCodeRequested(
+//     params: VerifycodeParams(
+//       email: 'youruser@test.com',
+//       code: '1234', // كود صحيح
+//     ),
+//   )),
+//   wait: const Duration(seconds: 3),
+//   expect: () => [
+//     AuthLoading(),
+//     isA<AuthCodeVerifiedSuccess>(),
+//   ],
+//   verify: (_) => print('✅ تم التحقق من الكود'),
+// );
 
+// // ❌ كود خاطئ
+// blocTest<AuthenticationBloc, AuthenticationState>(
+//   '🔴 فشل: كود تحقق خاطئ',
+//   build: () => authBloc,
+//   act: (bloc) => bloc.add(VerifyResetCodeRequested(
+//     params: VerifycodeParams(
+//       email: 'youruser@test.com',
+//       code: '9999', // كود خاطئ
+//     ),
+//   )),
+//   wait: const Duration(seconds: 3),
+//   expect: () => [
+//     AuthLoading(),
+//     isA<AuthFailure>(),
+//   ],
+//   verify: (bloc) {
+//     final state = bloc.state;
+//     if (state is AuthFailure) {
+//       print('❌ فشل التحقق من الكود: ${state.message}');
+//     }
+//   },
+// );
 
- 
-    // // ✅ تحقق كود صحيح
-    // blocTest<AuthenticationBloc, AuthenticationState>(
-    //   '🟢 تحقق كود صحيح',
-    //   build: () => authBloc,
-    //   act: (bloc) => bloc.add(VerifyResetCodeRequested(
-    //     params: VerifycodeParams(
-    //       email: 'youruser@test.com',
-    //       code: '1234', // كود صحيح
-    //     ),
-    //   )),
-    //   wait: const Duration(seconds: 3),
-    //   expect: () => [
-    //     AuthLoading(),
-    //     isA<AuthCodeVerifiedSuccess>(),
-    //   ],
-    //   verify: (_) => print('✅ تم التحقق من الكود'),
-    // );
+// // ✅ إعادة تعيين ناجحة
+// blocTest<AuthenticationBloc, AuthenticationState>(
+//   '🟢 إعادة تعيين كلمة المرور',
+//   build: () => authBloc,
+//   act: (bloc) => bloc.add(ResetPasswordRequested(
+//     params: ResetpasswordParams(
+//       email: 'youruser@test.com',
+//       code: '1234', // كود صحيح
+//       newPassword: 'newpassword123',
+//     ),
+//   )),
+//   wait: const Duration(seconds: 3),
+//   expect: () => [
+//     AuthLoading(),
+//     isA<AuthPasswordResetSuccess>(),
+//   ],
+//   verify: (_) => print('✅ تم إعادة تعيين كلمة المرور'),
+// );
 
-    // // ❌ كود خاطئ
-    // blocTest<AuthenticationBloc, AuthenticationState>(
-    //   '🔴 فشل: كود تحقق خاطئ',
-    //   build: () => authBloc,
-    //   act: (bloc) => bloc.add(VerifyResetCodeRequested(
-    //     params: VerifycodeParams(
-    //       email: 'youruser@test.com',
-    //       code: '9999', // كود خاطئ
-    //     ),
-    //   )),
-    //   wait: const Duration(seconds: 3),
-    //   expect: () => [
-    //     AuthLoading(),
-    //     isA<AuthFailure>(),
-    //   ],
-    //   verify: (bloc) {
-    //     final state = bloc.state;
-    //     if (state is AuthFailure) {
-    //       print('❌ فشل التحقق من الكود: ${state.message}');
-    //     }
-    //   },
-    // );
-
-    // // ✅ إعادة تعيين ناجحة
-    // blocTest<AuthenticationBloc, AuthenticationState>(
-    //   '🟢 إعادة تعيين كلمة المرور',
-    //   build: () => authBloc,
-    //   act: (bloc) => bloc.add(ResetPasswordRequested(
-    //     params: ResetpasswordParams(
-    //       email: 'youruser@test.com',
-    //       code: '1234', // كود صحيح
-    //       newPassword: 'newpassword123',
-    //     ),
-    //   )),
-    //   wait: const Duration(seconds: 3),
-    //   expect: () => [
-    //     AuthLoading(),
-    //     isA<AuthPasswordResetSuccess>(),
-    //   ],
-    //   verify: (_) => print('✅ تم إعادة تعيين كلمة المرور'),
-    // );
-
-    // // ❌ إعادة تعيين بكود خاطئ
-    // blocTest<AuthenticationBloc, AuthenticationState>(
-    //   '🔴 فشل: كود خاطئ عند إعادة التعيين',
-    //   build: () => authBloc,
-    //   act: (bloc) => bloc.add(ResetPasswordRequested(
-    //     params: ResetpasswordParams(
+// // ❌ إعادة تعيين بكود خاطئ
+// blocTest<AuthenticationBloc, AuthenticationState>(
+//   '🔴 فشل: كود خاطئ عند إعادة التعيين',
+//   build: () => authBloc,
+//   act: (bloc) => bloc.add(ResetPasswordRequested(
+//     params: ResetpasswordParams(

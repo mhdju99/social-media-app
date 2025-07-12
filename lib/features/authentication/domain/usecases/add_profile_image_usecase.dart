@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:social_media_app/core/errors/failure.dart';
 import 'package:social_media_app/features/authentication/domain/params/login_params.dart';
-import 'package:social_media_app/features/authentication/domain/params/upload_image_params.dart';
 import 'package:social_media_app/features/authentication/domain/repositories/authentication_repository.dart';
 
 class AddProfileImageUsecase {
@@ -13,7 +12,9 @@ class AddProfileImageUsecase {
     required this.repository,
   });
 
-Future<Either<Failure, void>>   call(File file) {
-    return repository.addProfailImage(file: file, );
+  Future<Either<Failure, void>> call(File file) {
+    return repository.addProfailImage(
+      file: file,
+    );
   }
 }

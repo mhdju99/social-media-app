@@ -4,12 +4,12 @@ import 'package:social_media_app/core/errors/failure.dart';
 import 'package:social_media_app/features/authentication/domain/repositories/authentication_repository.dart';
 
 class RequestResetcodeUsecase {
-    final AuthenticationRepository authenticationRepository;
+  final AuthenticationRepository authenticationRepository;
   RequestResetcodeUsecase({
     required this.authenticationRepository,
   });
 
-   Future<Either<Failure,void >> call(String email) {
+  Future<Either<Failure, void>> call(String email) {
     return authenticationRepository.requestResetCode(email: email);
   }
 }

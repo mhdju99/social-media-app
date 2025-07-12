@@ -1,10 +1,15 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/injection_container.dart';
+import 'package:social_media_app/core/utils/snackbar_helper.dart';
+import 'package:social_media_app/core/utils/validators.dart';
 import 'package:social_media_app/features/authentication/domain/params/login_params.dart';
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
+import 'package:social_media_app/features/authentication/presentation/screens/UploadProfileImagePage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomButton.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomTextField.dart';
+import 'package:social_media_app/features/authentication/presentation/screens/signUpPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/widgets/buttonText.dart';
 
@@ -19,26 +24,6 @@ class _LogInState extends State<LogIn> {
   String? _email;
   String? _password;
   final formkey = GlobalKey<FormState>();
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال البريد';
-    }
-
-    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$';
-    if (!RegExp(pattern).hasMatch(value)) {
-      return 'البريد الإلكتروني غير صالح';
-    }
-
-    return null;
-  }
-
-  // ✅ دالة التحقق من كلمة المرور
-  String? _validatePassword(String? value) {
-    if (value == null || value.length < 6) {
-      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +31,18 @@ class _LogInState extends State<LogIn> {
       body: BlocProvider(
         create: (context) => sl<AuthenticationBloc>(),
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-          listener: (context, state) {
+          listener: (contexts, state) {
             if (state is AuthSuccess) {
               Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => testpage()),
+                contexts,
+                MaterialPageRoute(
+                    builder: (contexts) => UploadProfileImagePage()),
               );
             } else if (state is AuthFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              SnackbarHelper.show(context,
+                  title: "",
+                  message: state.message,
+                  contentType: ContentType.failure);
             }
           },
           builder: (context, state) {
@@ -93,16 +80,15 @@ class _LogInState extends State<LogIn> {
                               child: Column(
                                 children: [
                                   CustomTextField(
-                                    prefixIcon:
-                                        const Icon(Icons.email_outlined),
-                                    // initial: cc.getemail(),
-                                    text: "Email",
-                                    onSave: (val) {
-                                      _email = val;
-                                    },
-                                    type: TextInputType.emailAddress,
-                                    validate: _validateEmail,
-                                  ),
+                                      prefixIcon:
+                                          const Icon(Icons.email_outlined),
+                                      // initial: cc.getemail(),
+                                      text: "Email",
+                                      onSave: (val) {
+                                        _email = val;
+                                      },
+                                      type: TextInputType.emailAddress,
+                                      validate: Validators.validateEmail),
                                   const SizedBox(
                                     height: 7,
                                   ),
@@ -112,7 +98,7 @@ class _LogInState extends State<LogIn> {
                                     onSave: (val) {
                                       _password = val;
                                     },
-                                    validate: _validatePassword,
+                                    validate: Validators.validatePassword,
                                     text: "Password",
                                     type: TextInputType.visiblePassword,
                                   ),
@@ -201,8 +187,11 @@ class _LogInState extends State<LogIn> {
                           ),
                           InkWell(
                             onTap: () {
-                              // Get.to(SignUP());
-                              // authControlar.isOriginalContent = false.obs;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignUP()),
+                              );
                             },
                             child: const Text(
                               "Sign Up Now",

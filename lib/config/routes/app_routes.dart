@@ -10,7 +10,7 @@ class Routes {
 }
 
 final routes = {
-  Routes.initialRoute:(context) => SplashScreen(),
+  Routes.initialRoute: (context) => SplashScreen(),
   Routes.LogIn: (context) => LogIn(),
   // Routes.SignUP: (context) => SignUP()
 };

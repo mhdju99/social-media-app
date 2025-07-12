@@ -18,12 +18,12 @@ class DioConsumer extends ApiConsumer {
       bool isFormData = false}) async {
     try {
       var res = await dio.post(path,
-          data: isFormData ? FormData.fromMap(data) : data,
+          data: data,
           queryParameters: queryParameters,
           options: Options(
-             validateStatus: (status) {
-    return status != null && status >= 200 && status < 300;
-  },
+            validateStatus: (status) {
+              return status != null && status >= 200 && status < 300;
+            },
             headers: header,
             responseType: ResponseType.json,
           ));
@@ -84,6 +84,24 @@ class DioConsumer extends ApiConsumer {
       var res = await dio.patch(
         path,
         data: isFormData ? FormData.fromMap(data) : data,
+        queryParameters: queryParameters,
+        options: Options(
+            headers: header,
+          )
+      );
+      return res.data;
+    } on DioException catch (e) {
+      handleDioException(e);
+    }
+  }
+
+  @override
+  Future put(String path,
+      {dynamic data , Map<String, dynamic>? queryParameters}) async {
+    try {
+      var res = await dio.put(
+        path,
+        data: data,
         queryParameters: queryParameters,
       );
       return res.data;

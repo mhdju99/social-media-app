@@ -12,7 +12,8 @@ import 'package:social_media_app/features/authentication/domain/params/register_
 /// Concrete implementations of this repository interface will be provided
 /// in the data layer to interact with specific data sources (e.g., API, database).
 abstract class AuthenticationRepository {
-  Future<Either<Failure, UserEntity>> logIn({required String email, required String password});
+  Future<Either<Failure, UserEntity>> logIn(
+      {required String email, required String password});
   Future<Either<Failure, UserEntity>> register({
     required String userName,
     required bool certifiedDoctor,
@@ -27,9 +28,14 @@ abstract class AuthenticationRepository {
   });
   Future<void> logOut();
   Future<bool> isUserLogIn();
+ Future<String?> fetchCachedUserId();
   Future<Either<Failure, void>> requestResetCode({required String email});
-  Future<Either<Failure, String>> verifyResetCode({required String email, required String code});
-Future<Either<Failure, void>> resetPassword({required String newPassword, required String token});
-Future<Either<Failure, void>> addProfailImage({required File file});
-
+  Future<Either<Failure, String>> verifyResetCode(
+      {required String email, required String code});
+  Future<Either<Failure, void>> resetPassword(
+      {required String newPassword, required String token});
+  Future<Either<Failure, void>> addProfailImage({required File file});
+  Future<Either<Failure, void>> ChosePreferredTopics({
+    required String topic,
+  });
 }

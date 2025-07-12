@@ -1,7 +1,6 @@
 class EndPoints {
   static const String baserUrl = "https://dummyjson.com/";
   static const String todos = "${baserUrl}todos";
-
 }
 
 class ApiKey {

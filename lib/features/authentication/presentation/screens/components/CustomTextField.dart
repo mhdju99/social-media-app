@@ -6,16 +6,19 @@ import 'package:flutter/widgets.dart';
 class CustomTextField extends StatefulWidget {
   final String text;
   final String? initial;
-  Icon prefixIcon;
+  Icon? prefixIcon;
   String? Function(String?)? validate;
   void Function(String?)? onSave;
   void Function(String?)? onchange;
   void Function()? onEditingComplete;
   TextInputType? type;
+  final TextEditingController? controller;
+
   CustomTextField(
       {super.key,
+      this.controller,
       required this.text,
-      this.prefixIcon = const Icon(Icons.person),
+      this.prefixIcon,
       this.type,
       this.initial,
       this.validate,
@@ -27,9 +30,24 @@ class CustomTextField extends StatefulWidget {
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
-bool isVisible = true;
-
 class _CustomTextFieldState extends State<CustomTextField> {
+  late final TextEditingController _effectiveController;
+
+  bool isVisible = true;
+  @override
+  void initState() {
+    super.initState();
+    _effectiveController = widget.controller ?? TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      _effectiveController.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -37,6 +55,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       onChanged: widget.onchange,
       initialValue: widget.initial,
       keyboardType: widget.type,
+      controller: _effectiveController,
       obscureText:
           widget.type == TextInputType.visiblePassword ? isVisible : false,
       decoration: InputDecoration(

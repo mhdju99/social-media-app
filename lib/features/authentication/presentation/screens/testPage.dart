@@ -24,7 +24,7 @@ class _testpageState extends State<testpage> {
 
   Future<void> _loadToken() async {
     final localDataSource = sl<AuthenticationLocalDataSource>();
-    final token = await localDataSource.getToken();
+    final token = await localDataSource.getTokenSec();
 
     if (mounted) {
       setState(() {
@@ -35,6 +35,7 @@ class _testpageState extends State<testpage> {
     debugPrint("🔐 Token from SecureStorage: $token");
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: BlocProvider(
@@ -53,20 +54,23 @@ class _testpageState extends State<testpage> {
           }
         },
         builder: (context, state) {
-          return Column(
-            children: [
-              Center(
-                child: _token == null
-                    ? const Text("لم يتم العثور على توكن")
-                    : Text("Token: $_token"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  context.read<AuthenticationBloc>().add(LogOutRequested());
-                },
-                child: const Text("Logout"),
-              )
-            ],
+          return SafeArea(
+            top: true,
+            child: Column(
+              children: [
+                Center(
+                  child: _token == null
+                      ? const Text("لم يتم العثور على توكن")
+                      : Text("Token: $_token"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    context.read<AuthenticationBloc>().add(LogOutRequested());
+                  },
+                  child: const Text("Logout"),
+                )
+              ],
+            ),
           );
         },
       ),

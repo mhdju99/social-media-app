@@ -6,6 +6,7 @@ class ServerException implements Exception {
   final ErrorModel errorModel;
   ServerException(this.errorModel);
 }
+
 //!CacheExeption
 class CacheExeption implements Exception {
   final String errorMessage;
@@ -65,7 +66,7 @@ handleDioException(DioException e) {
 
   if (data == null) {
     throw UnknownException(
-        ErrorModel(errorMessage: 'استجابة غير متوقعة من الخادم', status: 500));
+        ErrorModel(errorMessage: "Unexpected server response", status: 500));
   }
   switch (e.type) {
     case DioExceptionType.connectionError:

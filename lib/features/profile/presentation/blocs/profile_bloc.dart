@@ -1,0 +1,114 @@
+import 'dart:io';
+
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
+import 'package:social_media_app/features/profile/domain/entities/user_entity.dart';
+
+import 'package:social_media_app/features/profile/domain/usecases/BlockUnblockUsecase.dart';
+import 'package:social_media_app/features/profile/domain/usecases/ChangePasswordUsecase.dart';
+import 'package:social_media_app/features/profile/domain/usecases/FollowUnfollowUsecase.dart';
+import 'package:social_media_app/features/profile/domain/usecases/GetProfilePhotoAndNameUsecase.dart';
+import 'package:social_media_app/features/profile/domain/usecases/GetUserProfileUsecase.dart';
+import 'package:social_media_app/features/profile/domain/usecases/ModifyProfileUsecase.dart';
+part 'profile_event.dart';
+part 'profile_state.dart';
+
+class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
+  final BlockUnblockUsecase blockUnblockUsecase;
+  final ChangePasswordUsecase changePasswordUsecase;
+  final FollowUnfollowUsecase followUnfollowUsecase;
+  final GetUserProfileUsecase getUserProfileUsecase;
+  final GetProfilePhotoAndNameUsecase getPhotoAndNameUsecase;
+  final ModifyProfileUsecase modifyProfileUsecase;
+  GetUserIdUseCase getUserIdUseCase;
+
+  ProfileBloc({
+    required this.blockUnblockUsecase,
+    required this.getUserIdUseCase,
+    required this.changePasswordUsecase,
+    required this.followUnfollowUsecase,
+    required this.getUserProfileUsecase,
+    required this.getPhotoAndNameUsecase,
+    required this.modifyProfileUsecase,
+  }) : super(ProfileInitial()) {
+    on<GetMyProfileEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final userId = await getUserIdUseCase();
+      print("ssssssssssssssssssss");
+      print(userId);
+      final result = await getUserProfileUsecase(userId.toString());
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (userProfile) => emit(ProfileSuccess(userProfile)),
+      );
+    });
+    on<GetUserProfileEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await getUserProfileUsecase(event.userId);
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (userProfile) => emit(ProfileSuccess(userProfile)),
+      );
+    });
+
+    on<GetProfilePhotoAndNameEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await getPhotoAndNameUsecase(event.userId);
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (user) => emit(ProfileSuccess(user)),
+      );
+    });
+
+    on<ModifyProfileEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await modifyProfileUsecase(
+        userName: event.userName,
+        photo: event.photo,
+        firstName: event.firstName,
+        lastName: event.lastName,
+        email: event.email,
+        birthDate: event.birthDate,
+        country: event.country,
+        city: event.city,
+        about: event.about,
+        preferredTopics: event.preferredTopics,
+      );
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (_) => emit(ProfileSuccess("تم تعديل الملف الشخصي")),
+      );
+    });
+
+    on<ChangePasswordEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await changePasswordUsecase(
+        oldPassword: event.oldPassword,
+        newPassword: event.newPassword,
+      );
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (_) => emit(ProfileSuccess("تم تغيير كلمة المرور")),
+      );
+    });
+
+    on<BlockUnblockUserEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await blockUnblockUsecase(event.userId);
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (_) => emit(ProfileSuccess("تم تعديل حالة الحظر")),
+      );
+    });
+
+    on<FollowUnfollowUserEvent>((event, emit) async {
+      emit(ProfileLoading());
+      final result = await followUnfollowUsecase(event.userId);
+      result.fold(
+        (failure) => emit(ProfileFailure(failure.errMessage)),
+        (_) => emit(ProfileSuccess("تم تعديل حالة المتابعة")),
+      );
+    });
+  }
+}

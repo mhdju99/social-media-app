@@ -2,7 +2,6 @@
 import 'package:social_media_app/features/authentication/domain/entities/user_entity/location.dart';
 
 class RegisterParams {
-
   final bool certifiedDoctor;
   final String firstName;
   final String userName;

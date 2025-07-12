@@ -1,13 +1,13 @@
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class CacheHelper {
- static late SharedPreferences sharedPreferences;
- static late  FlutterSecureStorage _secureStorage;
+  static late SharedPreferences sharedPreferences;
+  static late FlutterSecureStorage _secureStorage;
   static const String _tokenKey = 'auth_token';
 
 //! Here The Initialize of cache .
- static Future<void> init() async {
+  static Future<void> init() async {
     sharedPreferences = await SharedPreferences.getInstance();
     _secureStorage = FlutterSecureStorage();
   }
@@ -36,16 +36,17 @@ class CacheHelper {
       return await sharedPreferences.setDouble(key, value);
     }
   }
-  Future<void> saveTokenSec({ required dynamic value}) async {
-      await _secureStorage.write(key: _tokenKey, value: value);
 
+  Future<void> saveTokenSec({required dynamic value}) async {
+    await _secureStorage.write(key: _tokenKey, value: value);
   }
-     Future<String?> getTokenSec() async {
+
+  Future<String?> getTokenSec() async {
     return await _secureStorage.read(key: _tokenKey);
   }
 
   // ✅ دالة لحذف التوكن
-   Future<void> deleteTokenSec() async {
+  Future<void> deleteTokenSec() async {
     await _secureStorage.delete(key: _tokenKey);
   }
 //! this method to get data already saved in local database
@@ -83,6 +84,4 @@ class CacheHelper {
       return await sharedPreferences.setInt(key, value);
     }
   }
-
-
 }

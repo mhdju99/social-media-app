@@ -30,13 +30,14 @@ class RegisterRequested extends AuthenticationEvent {
 class LogOutRequested extends AuthenticationEvent {}
 
 class UploadProfileImageRequested extends AuthenticationEvent {
-  UploadImageParams params;
   UploadProfileImageRequested({
-    required this.params,
+    required this.file,
   });
 
+  File file;
+
   @override
-  List<Object> get props => [params];
+  List<Object> get props => [file];
 }
 
 class CheckAuthStateRequested extends AuthenticationEvent {}
@@ -55,10 +56,19 @@ class VerifyResetCodeRequested extends AuthenticationEvent {
   VerifyResetCodeRequested({
     required this.code,
   });
- 
 
   @override
   List<Object> get props => [code];
+}
+
+class ChosePreferredTopicsRequested extends AuthenticationEvent {
+  String topic;
+  ChosePreferredTopicsRequested({
+    required this.topic,
+  });
+
+  @override
+  List<Object> get props => [topic];
 }
 
 class ResetPasswordRequested extends AuthenticationEvent {
@@ -68,5 +78,7 @@ class ResetPasswordRequested extends AuthenticationEvent {
   });
 
   @override
-  List<Object> get props => [ newPassword];
+  List<Object> get props => [newPassword];
 }
+
+class toggleRegisterContent extends AuthenticationEvent {}

@@ -28,7 +28,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
   @override
   Future<bool> isUserLogIn() async {
-    final String? token = await local.getToken();
+    final String? token = await local.getTokenSec();
     final result = token != null && token.isNotEmpty;
     return result;
   }
@@ -43,13 +43,13 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
-      return left(Failure(errMessage: a.toString()));
+      return left(Failure(errMessage: "somthing wrong"));
     }
   }
 
   @override
   Future<void> logOut() async {
-    await local.delToken();
+    await local.delTokenSec();
   }
 
   @override
@@ -80,55 +80,96 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Right(userModel.toEntity());
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
-    } 
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
+    }
   }
 
   @override
- Future<Either<Failure, void>> resetPassword(
+  Future<Either<Failure, void>> resetPassword(
       {required String newPassword, required String token}) async {
- try {
-      await remot.resetPassword(newPassword: newPassword,token: token);
+    try {
+      await remot.resetPassword(newPassword: newPassword, token: token);
       return right(null);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
     }
   }
-  
+
   @override
   Future<Either<Failure, void>> requestResetCode(
-      {required String email}) async{
+      {required String email}) async {
     try {
       await remot.requestResetCode(email);
       return right(null);
     } on ServerException catch (e) {
       return right(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
     }
   }
-  
+
   @override
   Future<Either<Failure, String>> verifyResetCode(
       {required String email, required String code}) async {
     try {
-              debugPrint("aaaaaaaaaaaaaaaaaa ${email}");
+      debugPrint("aaaaaaaaaaaaaaaaaa ${email}");
 
-    final  token=  await remot.verifyResetCode(code: code,email: email);
+      final token = await remot.verifyResetCode(code: code, email: email);
       return right(token);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
     }
   }
 
   @override
-  Future<Either<Failure, void>> addProfailImage(
-      {required File file}) async {
+  Future<Either<Failure, void>> addProfailImage({required File file}) async {
     try {
       await remot.addProfileImage(file: file);
       return right(null);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> ChosePreferredTopics(
+      {required String topic}) async {
+    try {
+      final userModel = await remot.ChosePreferredTopics(Topic: topic);
+      return Right(null);
+    } on ServerException catch (e) {
+      return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: "somthing wrong"));
+    }
   }
 
+  @override
+  Future<Either<Failure, void>> preferredTopics({required String topics}) {
+    // TODO: implement preferredTopics
+    throw UnimplementedError();
+  }
 
+  @override
+  Future<String?> fetchCachedUserId() async {
+    try {
+      final userId = await local.getData("userID");
+      return userId;
+    } on CacheExeption catch (e) {
+            debugPrint(e.errorMessage);
 
+      return null;
+    } catch (a) {
+                  debugPrint(a.toString());
+
+      return null;
+    }
+  }
+}

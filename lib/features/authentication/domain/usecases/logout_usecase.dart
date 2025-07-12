@@ -12,7 +12,7 @@ class LogOutUserUseCase {
   final AuthenticationRepository authenticationRepository;
   LogOutUserUseCase(this.authenticationRepository);
 
- Future<void> call(){
+  Future<void> call() {
     return authenticationRepository.logOut();
   }
 }

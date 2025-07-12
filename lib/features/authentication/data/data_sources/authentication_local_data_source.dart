@@ -11,9 +11,12 @@ import 'package:social_media_app/features/authentication/domain/entities/user_en
 /// This abstract class outlines the methods that concrete data source
 /// implementations should implement, such as fetching data from a remote API, local database, or any other data source.
 abstract class AuthenticationLocalDataSource {
-  Future<void> saveToken(String token);
-  Future<void> delToken();
-  Future<String?> getToken();
+  Future<void> saveTokenSec(String token);
+  Future<void> delTokenSec();
+  Future<String?> getTokenSec();
+  Future<void> saveData(String data, String key);
+  Future<void> delData(String key);
+  Future<String?> getData(String key);
   //saceuserdata()
 }
 
@@ -28,18 +31,34 @@ class AuthenticationLocalDataSourceImpl
   AuthenticationLocalDataSourceImpl({required this.cache});
 
   @override
-  Future<void> delToken()async {
+  Future<void> delTokenSec() async {
     cache.deleteTokenSec();
     //add some error handling
   }
 
   @override
-  Future<String?> getToken() async {
+  Future<String?> getTokenSec() async {
     return cache.getTokenSec();
   }
 
   @override
-  Future<void> saveToken(String token) async {
+  Future<void> saveTokenSec(String token) async {
     cache.saveTokenSec(value: token);
+  }
+
+  @override
+  Future<void> delData(String key) async {
+    cache.removeData(key: key);
+    //add some error handling
+  }
+
+  @override
+  Future<String?> getData(String key) async {
+    return cache.getData(key: key);
+  }
+
+  @override
+  Future<void> saveData(String data, String key) async {
+    cache.saveData(key: key, value: data);
   }
 }

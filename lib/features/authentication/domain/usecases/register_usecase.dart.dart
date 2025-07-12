@@ -9,7 +9,7 @@ class RegisterUseCase {
 
   RegisterUseCase(this.repository);
 
- Future<Either<Failure, UserEntity>>  call(RegisterParams params) {
+  Future<Either<Failure, UserEntity>> call(RegisterParams params) {
     return repository.register(
       userName: params.userName,
       certifiedDoctor: params.certifiedDoctor,

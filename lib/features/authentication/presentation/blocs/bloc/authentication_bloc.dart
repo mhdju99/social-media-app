@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -8,13 +9,14 @@ import 'package:social_media_app/features/authentication/domain/params/ResetPass
 import 'package:social_media_app/features/authentication/domain/params/VerifyCode_params.dart';
 import 'package:social_media_app/features/authentication/domain/params/login_params.dart';
 import 'package:social_media_app/features/authentication/domain/params/register_params.dart';
-import 'package:social_media_app/features/authentication/domain/params/upload_image_params.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/Chose_Preferred_Topics_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/add_profile_image_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/check_auth_status_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/login_usecase.dart.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/logout_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/register_usecase.dart.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/reset_password_usecase.dart';
+import 'package:test/test.dart';
 
 import '../../../domain/usecases/request_resetcode_usecase.dart';
 import '../../../domain/usecases/verify_resetcode_usecase.dart';
@@ -32,6 +34,7 @@ class AuthenticationBloc
   final RequestResetcodeUsecase requestResetCodeUseCase;
   final VerifyResetCodeUseCase verifyResetCodeUseCase;
   final ResetpasswordUsecase resetPasswordUseCase;
+  final ChosePreferredTopicsUsecase chosePreferredTopicsUsecase;
   String _resetToken = "";
   String get resetToken => _resetToken;
   void setResetToken(String token) {
@@ -46,6 +49,7 @@ class AuthenticationBloc
   String get resetEmail => _resetEmail;
   AuthenticationBloc({
     required this.loginUseCase,
+    required this.chosePreferredTopicsUsecase,
     required this.registerUseCase,
     required this.addProfileImageUseCase,
     required this.logoutUseCase,
@@ -64,6 +68,8 @@ class AuthenticationBloc
       _handleVerifyResetCode,
     );
     on<ResetPasswordRequested>(_handleResetPassword);
+    on<ChosePreferredTopicsRequested>(_handleChosePreferredTopic);
+    // on<toggleRegisterContent>(_handletoggleRegister);
   }
 
   FutureOr<void> _handleRequestResetCode(
@@ -135,6 +141,17 @@ class AuthenticationBloc
     );
   }
 
+  FutureOr<void> _handleChosePreferredTopic(
+      ChosePreferredTopicsRequested event, emit) async {
+    // AuthenticationRepository repo=AuthenticationRepository();
+    emit(AuthLoading());
+    final result = await chosePreferredTopicsUsecase(event.topic);
+    result.fold(
+      (failure) => emit(AuthFailure(failure.errMessage)),
+      (_) => emit(ChosePreferredTopicsSuccess()),
+    );
+  }
+
   Future<void> _handleRegister(RegisterRequested event, emit) async {
     emit(AuthLoading());
     final result = await registerUseCase(event.params);
@@ -147,15 +164,15 @@ class AuthenticationBloc
   Future<void> _handleUploadImage(
       UploadProfileImageRequested event, emit) async {
     emit(AuthLoading());
-    // final result = await addProfileImageUseCase(event.params);
-    // result.fold(
-    //   (failure) => emit(AuthImageUploadFailure(failure.errMessage)),
-    //   (_) => emit(AuthImageUploadSuccess()),
-    // );
+    final result = await addProfileImageUseCase(event.file);
+    result.fold(
+      (failure) => emit(AuthImageUploadFailure(failure.errMessage)),
+      (_) => emit(AuthImageUploadSuccess()),
+    );
   }
 
   Future<void> _handleLogout(LogOutRequested event, emit) async {
-  try {
+    try {
       await logoutUseCase(); // حذف التوكن أو البيانات من التخزين
       emit(AuthenticationInitial()); // إعادة الحالة إلى البداية
     } catch (e) {
@@ -172,4 +189,15 @@ class AuthenticationBloc
       emit(AuthenticationInitial());
     }
   }
+
+  // Future<void> _handletoggleRegister(toggleRegisterContent event, emit) async {
+  //   if (state is toggelregister) {
+  //     emit(AuthenticationInitial());
+  //   }
+  //   else if(state is AuthenticationInitial){
+
+  //     emit(toggelregister());
+
+  //   }
+  // }
 }

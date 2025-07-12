@@ -12,7 +12,8 @@ class LoginUserUseCase {
   final AuthenticationRepository authenticationRepository;
   LoginUserUseCase(this.authenticationRepository);
 
- Future<Either<Failure, UserEntity>> call(LoginParams params){
-    return authenticationRepository.logIn(email: params.email,password: params.password);
+  Future<Either<Failure, UserEntity>> call(LoginParams params) {
+    return authenticationRepository.logIn(
+        email: params.email, password: params.password);
   }
 }

@@ -2,6 +2,8 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/databases/api/api_consumer.dart';
@@ -31,10 +33,11 @@ abstract class AuthenticationRemotDataSource {
   });
   Future<void> requestResetCode(String email);
   Future<String> verifyResetCode({required String email, required String code});
-  Future<void> addProfileImage(
-      { required File file});
+  Future<void> addProfileImage({required File file});
   Future<void> resetPassword(
       {required String token, required String newPassword});
+
+  Future<void> ChosePreferredTopics({required String Topic});
 }
 
 /// AuthenticationDataSourceImpl is the concrete implementation of the AuthenticationDataSource
@@ -64,13 +67,14 @@ class AuthenticationRemotDataSourceImpl
     Map<dynamic, dynamic> resposneData = resposne.data;
     UserModel userData = UserModel.fromResponse(resposneData);
     final String? token = resposne.headers.value('authorization');
-    if (token == null || token.isEmpty) {
+    if (token == null || token.isEmpty|| userData == null) {
       throw Exception("Authorization token not found in response headers");
     }
 
- 
     // ✅ خزّن التوكن محليًا
-    await local.saveToken(token);
+    await local.saveTokenSec(token);
+
+    await local.saveData(userData.id!,"userID");
 
     return userData;
     // debugPrint("📤 الرابط النهائي: ${resposne.realUri}");
@@ -107,6 +111,15 @@ class AuthenticationRemotDataSourceImpl
     });
     Map<String, dynamic> resposneData = resposne.data;
     UserModel userData = UserModel.fromResponse(resposneData);
+    final String? token = resposne.headers.value('authorization');
+    if (token == null || token.isEmpty) {
+      throw Exception("Authorization token not found in response headers");
+    }
+
+    // ✅ خزّن التوكن محليًا
+    await local.saveTokenSec(token);
+    await local.saveData(userData.id!, "userID");
+
     return userData;
   }
 
@@ -131,14 +144,29 @@ class AuthenticationRemotDataSourceImpl
   }
 
   @override
-  Future<void> addProfileImage(
-      {required File file}) async {
-          final formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(file.path),
+  Future<void> addProfileImage({required File file}) async {
+    print('📄 File name: ${file.path.split('/').last}');
+
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        file.path,
+        contentType: MediaType('image', 'jpeg'),
+      ),
     });
     await api.post(
-      isFormData: true,
-      EndPoints.verifyResetCodeEndPoint,
+      isFormData: false,
+      EndPoints.AddProfileImageEndPoint,
+      data: formData,
+      // header: {
+      //   "token": token,
+      // },
+    );
+  }
+
+  Future<void> ChosePreferredTopics({required String Topic}) async {
+    final formData = FormData.fromMap({'preferredTopics': Topic});
+    await api.patch(
+      EndPoints.ModifyProfileEndPoint,
       data: formData,
       // header: {
       //   "token": token,
@@ -149,8 +177,6 @@ class AuthenticationRemotDataSourceImpl
   @override
   Future<String> verifyResetCode(
       {required String email, required String code}) async {
-                      debugPrint("aaaaaaaaaaaaaaaaaa ${email}");
-
     Response resposne = await api.get(
       EndPoints.verifyResetCodeEndPoint,
       queryParameters: {"email": email},
@@ -158,10 +184,13 @@ class AuthenticationRemotDataSourceImpl
         "code": code,
       },
     );
-   final token = resposne.headers.value('token');
+    final token = resposne.headers.value('token');
     if (token == null) {
       throw Exception('Authorization token not found in response headers');
     }
     return token;
   }
 }
+
+
+
