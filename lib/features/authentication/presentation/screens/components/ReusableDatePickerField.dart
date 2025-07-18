@@ -8,8 +8,9 @@ class ReusableDatePickerField extends StatefulWidget {
   final DateTime? lastDate;
   final void Function(DateTime?)? onSaved;
   final String? Function(DateTime?)? validator;
+  final TextEditingController controller;
 
-  const ReusableDatePickerField({
+const  ReusableDatePickerField({
     super.key,
     this.label = 'اختر التاريخ',
     this.icon = Icons.calendar_today,
@@ -18,6 +19,7 @@ class ReusableDatePickerField extends StatefulWidget {
     this.lastDate,
     this.onSaved,
     this.validator,
+  required  this.controller,
   });
 
   @override
@@ -26,12 +28,11 @@ class ReusableDatePickerField extends StatefulWidget {
 }
 
 class _ReusableDatePickerFieldState extends State<ReusableDatePickerField> {
-  final TextEditingController _controller = TextEditingController();
   DateTime? _selectedDate;
 
   @override
   void dispose() {
-    _controller.dispose(); // منع تسرب الذاكرة
+widget.   controller.dispose(); // منع تسرب الذاكرة
     super.dispose();
   }
 
@@ -48,7 +49,7 @@ class _ReusableDatePickerFieldState extends State<ReusableDatePickerField> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _controller.text = "${picked.day}/${picked.month}/${picked.year}";
+        widget.controller.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
   }
@@ -56,7 +57,7 @@ class _ReusableDatePickerFieldState extends State<ReusableDatePickerField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: _controller,
+      controller: widget.controller,
       readOnly: true,
       decoration: InputDecoration(
         labelText: widget.label,

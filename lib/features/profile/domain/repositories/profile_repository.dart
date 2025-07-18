@@ -12,13 +12,14 @@ import 'package:social_media_app/features/profile/domain/entities/user_entity.da
 /// in the data layer to interact with specific data sources (e.g., API, database).
 abstract class ProfileRepository {
   Future<Either<Failure, UserProfile>> getUserProfile({required String userId});
-  Future<Either<Failure, User>> getprofilePhotoAndName({required String userId});
-
+  Future<Either<Failure, List<User>>> getprofilePhotoAndName(
+      {required List<String> userId});
   Future<Either<Failure, void>> followUnfollowUser({required String userId});
   Future<Either<Failure, void>> blockUnblock({required String userId});
-  Future<Either<Failure, void>> changepassword({required String oldPassword, required String newPassword});
-  Future<Either<Failure, void>> modifyprofile({
- String? userName,
+  Future<Either<Failure, void>> changepassword(
+      {required String oldPassword, required String newPassword});
+  Future<Either<Failure, void>> modifyprofile(
+      {String? userName,
       File? photo,
       String? firstName,
       List<String>? preferredTopics,
@@ -27,7 +28,5 @@ abstract class ProfileRepository {
       String? email,
       String? country,
       String? city,
-      String? about
-
-  });
+      String? about});
 }

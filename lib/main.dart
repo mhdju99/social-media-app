@@ -10,10 +10,10 @@ import 'package:social_media_app/features/authentication/presentation/screens/sp
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
-  await init(); // ⬅️ استدعِ التهيئة هنا
+  await init();
   await init2();
   await init3();
-  await CacheHelper.init(); // **مهم جدًا**
+  await CacheHelper.init(); 
 
   runApp(const MyApp());
 }

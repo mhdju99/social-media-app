@@ -10,7 +10,11 @@ class AddComment {
   Future<Either<Failure, void>> call({
     required String postId,
     required String content,
+      String? repliedTo,
+
   }) {
-    return repository.addComment(postId: postId, content: content);
+    return repository.addComment(postId: postId, content: content,
+    repliedTo: repliedTo,
+);
   }
 }

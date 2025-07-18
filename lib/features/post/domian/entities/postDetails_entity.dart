@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
 import 'user_entity.dart';
 
-class Post extends Equatable {
+class PostDetails extends Equatable {
   final String id;
   final String topic;
   final String description;
@@ -13,10 +13,10 @@ class Post extends Equatable {
   final int likesCount;
   final bool reelFlag;
   final User publisher;
-  final List<String> comments;
+  final List<Comment> comments;
   final DateTime createdAt;
 
-  const Post({
+  const PostDetails({
     required this.id,
     required this.topic,
     required this.description,
@@ -45,7 +45,7 @@ class Post extends Equatable {
         likes,
         isMyPost
       ];
-      Post copyWith({
+      PostDetails copyWith({
     String? id,
     String? topic,
     String? description,
@@ -56,10 +56,10 @@ class Post extends Equatable {
     int? likesCount,
     bool? reelFlag,
     User? publisher,
-    List<String>? comments,
+    List<Comment>? comments,
     DateTime? createdAt,
   }) {
-    return Post(
+    return PostDetails(
       id: id ?? this.id,
       topic: topic ?? this.topic,
       description: description ?? this.description,

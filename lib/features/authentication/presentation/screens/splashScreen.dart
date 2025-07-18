@@ -24,6 +24,7 @@ class SplashScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MainPage()),
+              // MaterialPageRoute(builder: (context) => MainPage()),
             );
           } else if (state is AuthenticationInitial) {
             print("object");

@@ -10,6 +10,11 @@ class Comment extends Equatable {
   final String? repliedTo;
   final List<String>? likedBy;
   final DateTime createdAt;
+   final bool isLiked;
+   final bool? isMyComment;
+     final int likesCount;
+
+
 
   const Comment({
     required this.id,
@@ -19,11 +24,25 @@ class Comment extends Equatable {
     this.repliedTo,
     required this.likedBy,
     required this.createdAt,
-  });
+    required this.likesCount,
+    this.isLiked=false,
+    this.isMyComment= false,
 
-  @override
-  List<Object?> get props =>
-      [id, content, user, repliedBy, repliedTo, likedBy, createdAt];
+  });
+@override
+  List<Object?> get props => [
+        id,
+        content,
+        user,
+        repliedBy,
+        repliedTo,
+        likedBy,
+        createdAt,
+        isLiked, // 👈 مفقود سابقًا
+        isMyComment, // 👈 مفقود
+        likesCount // 👈 مفقود
+      ];
+
       Comment copyWith({
     String? id,
     String? content,
@@ -32,6 +51,11 @@ class Comment extends Equatable {
     String? repliedTo,
     List<String>? likedBy,
     DateTime? createdAt,
+    bool? isLiked,
+        bool? isMyComment,
+           int? likesCount
+
+
   }) {
     return Comment(
       id: id ?? this.id,
@@ -41,6 +65,9 @@ class Comment extends Equatable {
       repliedTo: repliedTo ?? this.repliedTo,
       likedBy: likedBy ?? this.likedBy,
       createdAt: createdAt ?? this.createdAt,
+      isLiked: isLiked??false,
+      isMyComment: isMyComment??this.isMyComment,
+      likesCount: likesCount??this.likesCount
     );
   }
 

@@ -9,10 +9,16 @@ import 'package:social_media_app/features/authentication/domain/usecases/GetUser
 import 'package:social_media_app/features/post/data/data_sources/Post_Remot_DataSource.dart';
 import 'package:social_media_app/features/post/data/repositories/post_repository_impl.dart';
 import 'package:social_media_app/features/post/domian/repositories/post_repository.dart';
+import 'package:social_media_app/features/post/domian/usecases/DeleteComment.dart';
+import 'package:social_media_app/features/post/domian/usecases/GetReplies.dart';
+import 'package:social_media_app/features/post/domian/usecases/LikeUnlikeComment.dart';
 import 'package:social_media_app/features/post/domian/usecases/add_comment.dart';
 import 'package:social_media_app/features/post/domian/usecases/create_post.dart';
+import 'package:social_media_app/features/post/domian/usecases/delete_post.dart';
 import 'package:social_media_app/features/post/domian/usecases/get_post_details.dart';
+import 'package:social_media_app/features/post/domian/usecases/get_posts.dart';
 import 'package:social_media_app/features/post/domian/usecases/like_unlike_post.dart';
+import 'package:social_media_app/features/post/domian/usecases/modify_post.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
 
 final sl = GetIt.instance;
@@ -27,7 +33,12 @@ Future<void> init2() async {
     addComment: sl() ,
     createPost: sl() ,
     getUserIdUseCase: sl() ,
-
+    deleteCommentUseCase: sl(),
+    getRepliesUseCase: sl(),
+    likeUnlikeCommentUseCase: sl(),
+    deletePost: sl(),
+modifyPost: sl(),
+getPosts:  sl()
     ),
   );
   sl.registerLazySingleton(() => GetPostDetails( sl()));
@@ -37,6 +48,12 @@ Future<void> init2() async {
 sl.registerLazySingleton<GetUserIdUseCase>(
     () => GetUserIdUseCase(sl<AuthenticationRepository>()),
   );
+  sl.registerLazySingleton(() => DeleteComment(sl()));
+  sl.registerLazySingleton(() => LikeUnlikeComment(sl()));
+  sl.registerLazySingleton(() => GetReplies(sl()));
+  sl.registerLazySingleton(() => DeletePost(sl()));
+  sl.registerLazySingleton(() => ModifyPost(sl()));
+  sl.registerLazySingleton(() => GetPosts(sl()));
 
   sl.registerLazySingleton<PostRepository>(
     () => PostRepositoryImpl( sl()),

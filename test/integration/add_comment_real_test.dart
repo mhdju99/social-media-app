@@ -30,7 +30,6 @@ void main() {
     final result = await usecase(postId: "68696da0833b9926d5a1b346"
       ,
     describtion: "tessssssssssst",
-    topic:"Anxiety & Stress Management" ,
     deleteImagesIds: ["68696da0833b9926d5a1b346__0.6928402343196167.jpg"]
     // images: [
     //       File('test/integration/qq.png'),

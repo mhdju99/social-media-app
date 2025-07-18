@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:social_media_app/features/authentication/domain/repositories/authentication_repository.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/add_profile_image_usecase.dart';
 import 'package:social_media_app/features/profile/domain/entities/user_entity.dart';
 
 import 'package:social_media_app/features/profile/domain/usecases/BlockUnblockUsecase.dart';
@@ -22,8 +24,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetProfilePhotoAndNameUsecase getPhotoAndNameUsecase;
   final ModifyProfileUsecase modifyProfileUsecase;
   GetUserIdUseCase getUserIdUseCase;
+  final AddProfileImageUsecase addProfileImageUsecase;
 
-  ProfileBloc({
+  ProfileBloc( {
     required this.blockUnblockUsecase,
     required this.getUserIdUseCase,
     required this.changePasswordUsecase,
@@ -31,12 +34,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.getUserProfileUsecase,
     required this.getPhotoAndNameUsecase,
     required this.modifyProfileUsecase,
+  required  this.addProfileImageUsecase,
   }) : super(ProfileInitial()) {
     on<GetMyProfileEvent>((event, emit) async {
       emit(ProfileLoading());
       final userId = await getUserIdUseCase();
-      print("ssssssssssssssssssss");
-      print(userId);
       final result = await getUserProfileUsecase(userId.toString());
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
@@ -63,9 +65,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     on<ModifyProfileEvent>((event, emit) async {
       emit(ProfileLoading());
+
+        if (event.photo != null) {
+        final imageResult = await addProfileImageUsecase(event.photo!);
+        if (imageResult.isLeft()) {
+          return emit(
+              ProfileFailure(imageResult.fold((f) => f.errMessage, (_) => '')));
+        }
+      }
+
       final result = await modifyProfileUsecase(
         userName: event.userName,
-        photo: event.photo,
         firstName: event.firstName,
         lastName: event.lastName,
         email: event.email,

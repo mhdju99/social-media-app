@@ -1,4 +1,4 @@
-import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
+import 'package:social_media_app/features/post/domian/entities/postDetails_entity.dart';
 
 class UserProfile {
   final String userName;
@@ -13,7 +13,10 @@ class UserProfile {
   final List<String> blockedUsers;
   final List<String> preferredTopics;
   final LocationEntity location;
-  final List<Post> posts;
+  final List<PostDetails> posts;
+     final DateTime? lastSeenAt;
+  final String? about;
+  final List<String>? files;
 
   const UserProfile({
     required this.userName,
@@ -29,6 +32,9 @@ class UserProfile {
     required this.preferredTopics,
     required this.location,
     required this.posts,
+            this.lastSeenAt,
+    this.about,
+    this.files,
   });
 }
 

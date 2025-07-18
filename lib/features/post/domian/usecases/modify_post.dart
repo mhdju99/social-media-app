@@ -10,14 +10,12 @@ class ModifyPost {
 
   Future<Either<Failure, void>> call({
     required String postId,
-    required String topic,
     required String describtion,
     List<File>? images,
     List<String>? deleteImagesIds,
   }) {
     return repository.modifyPost(
       postId: postId,
-      topic: topic,
       describtion: describtion,
       images: images,
       deleteImagesIds: deleteImagesIds,

@@ -20,7 +20,7 @@ class SignUP extends StatefulWidget {
 
 class _SignUPState extends State<SignUP> {
   final firstFormKey = GlobalKey<FormState>();
-  // final firstNameController = TextEditingController();
+  final dateController = TextEditingController();
   String? userName;
 
   String? firstName;
@@ -145,6 +145,7 @@ class _SignUPState extends State<SignUP> {
                 height: 9,
               ),
               ReusableDatePickerField(
+                controller: dateController,
                 label: "Birth Date",
                 onSaved: (date) => birthDate = date,
                 validator: (date) =>

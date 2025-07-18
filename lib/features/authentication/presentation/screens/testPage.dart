@@ -32,7 +32,6 @@ class _testpageState extends State<testpage> {
       });
     }
 
-    debugPrint("🔐 Token from SecureStorage: $token");
   }
 
   @override

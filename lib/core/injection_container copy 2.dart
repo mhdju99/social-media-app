@@ -29,6 +29,7 @@ Future<void> init3() async {
     getUserProfileUsecase: sl() ,
     modifyProfileUsecase: sl() ,
     getUserIdUseCase: sl() ,
+    addProfileImageUsecase: sl()
 
     ),
   );

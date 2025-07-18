@@ -8,7 +8,7 @@ class GetProfilePhotoAndNameUsecase {
 
   GetProfilePhotoAndNameUsecase(this.repository);
 
-  Future<Either<Failure, User>> call(String userId) {
+  Future<Either<Failure, List<User>>> call(List<String> userId) {
     return repository.getprofilePhotoAndName(userId: userId);
   }
 }

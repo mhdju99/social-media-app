@@ -21,7 +21,7 @@ class GetMyProfileEvent extends ProfileEvent {
 
 }
 class GetProfilePhotoAndNameEvent extends ProfileEvent {
-  final String userId;
+  final List<String> userId;
 
   const GetProfilePhotoAndNameEvent(this.userId);
 

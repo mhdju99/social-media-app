@@ -1,14 +1,25 @@
 // 🔷 Comments Section
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/injection_container%20copy.dart';
+import 'package:social_media_app/core/utils/image_viewer_helper.dart';
+import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomTextField.dart';
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
+import 'package:social_media_app/features/post/domian/entities/postDetails_entity.dart';
 import 'package:social_media_app/features/post/domian/usecases/like_unlike_post.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_media_app/features/post/presentation/screens/components/ReelVideoPlayer.dart';
+import 'package:social_media_app/features/post/presentation/screens/components/buildComment.dart';
+import 'package:social_media_app/features/post/presentation/screens/modifyPost..dart';
+import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
 
 class PostDetailsPage extends StatefulWidget {
-  const PostDetailsPage({super.key});
+  final String postid;
+  const PostDetailsPage({super.key, required this.postid});
 
   @override
   _PostDetailsPageState createState() => _PostDetailsPageState();
@@ -19,39 +30,8 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   final ScrollController _scrollController = ScrollController();
 
   bool isSubmitting = false;
-  var username = 'د. حكيم الحكيم';
-  var time = 'منذ 5 دقائق';
-  var content =
-      'كنت أعاني من صداع شديد لأسابيع، ولكن بعد تجربة بعض النصائح من الدكتورة الحكيمة أ.ي، أشعر بتحسن كبير! #وداعا_للصداع #نصائح_طبية';
-  var avatarUrl =
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAKvt_h7XNeQuygS26VtcqtMYhuOMRv8kgOwb9eKQYtdWyDXKCSCE_uo_FHSlQqiznAH-Pdw6YxiIA6Pw1iXaJj1-OMS3bxPgxkkpmcdCwgxbIIBSXB5osonvYf2ZQTqq4RunmRayPTzknDXaMPU5P3uvzvmEnXOsNqNbBGzabTaPXCZ3bB4fef1Jwiv0mkbPb9xZcri9NlYwRYHQSEGPRQeD5BTNNX_2lV_VL2UO-WuaKgdNuRPmZ7YYjI0_0PlqdZY_n4Omw-Dg0';
-  var imageUrl =
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAjPhKdfw3TPm63nmopt6yWe_LyrLTt3Ug8q5409WxggdrIJiFC1uIP-SY2wQN7Sf9ApJ6Wr67xO3pzNuud1zZsCH1yhtaiN2xABlI_4onQe-g-MxRcLoD6RsDlh-Zt7JvdUxcrFw0BuVA6rJiQbbHY8Xjw1HMnZQruHJYkckaBp3vDeqpFajePIHs52Sf7vgpjyBKjDuPRCwijn6dDaJGShjCPNcdQBZVtPJUfcEjD4XyFnlW4AqR5TEKOWSxVhbtOKNb4u3muYw4';
-  var likes = '1.8 ';
-  var commentsz = '235';
-  List<Map<String, dynamic>> comments = [
-    {
-      "author": "John Doe",
-      "text":
-          "This is a powerful post.asdasdasdasdasdasdasdasdasdasdsd Respect!",
-      "replies": [
-        {"author": "Ali", "text": "Totally agree!"},
-        {"author": "Sara", "text": "Yes, very inspiring."}
-      ]
-    },
-    {
-      "author": "Emily",
-      "text": "Praying for peace in Palestine 💔",
-      "replies": []
-    },
-    {
-      "author": "Michael",
-      "text": "We need to raise awareness about this!",
-      "replies": [
-        {"author": "Yara", "text": "Start by sharing it!"}
-      ]
-    },
-  ];
+
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -62,95 +42,91 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     }
   }
 
-  Widget buildComment(Comment comment) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  void _showPostOptions(BuildContext contexta,
+    PostDetails post,) {
+    showModalBottomSheet(
+      context: contexta,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuAKvt_h7XNeQuygS26VtcqtMYhuOMRv8kgOwb9eKQYtdWyDXKCSCE_uo_FHSlQqiznAH-Pdw6YxiIA6Pw1iXaJj1-OMS3bxPgxkkpmcdCwgxbIIBSXB5osonvYf2ZQTqq4RunmRayPTzknDXaMPU5P3uvzvmEnXOsNqNbBGzabTaPXCZ3bB4fef1Jwiv0mkbPb9xZcri9NlYwRYHQSEGPRQeD5BTNNX_2lV_VL2UO-WuaKgdNuRPmZ7YYjI0_0PlqdZY_n4Omw-Dg0'),
-                radius: 20,
-              ),
-              const SizedBox(
-                width: 6,
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        comment.user.userName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        comment.content,
-                        maxLines: 3, // أو احذف maxLines لتُعرض كل السطور
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis, // أو TextOverflow.clip
-                      ),
-                    ],
-                  ),
+              const SizedBox(height: 3),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
                 ),
-              )
+              ),
+              const SizedBox(height: 16),
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.mode_edit_outline_outlined,
+                  ),
+                  title: const Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                  onTap: () async{
+                                                            Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
+
+                   final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => ModifyPostPage(
+                          post:post ,
+                        )),
+                  );
+                    if (result == 'refresh') {
+                      contexta
+                          .read<PostBloc>()
+                          .add(GetPostRequested(widget.postid));
+                    }
+                  },
+                ),
+              ),
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded,
+                      color: Colors.red),
+                  title: const Text(
+                    "Delete",
+                    style: TextStyle(fontSize: 14, color: Colors.red),
+                  ),
+                  onTap: () {
+                                        Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
+
+                           contexta
+                        .read<PostBloc>()
+                        .add(DeletePostRequested(post.id));
+
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
-          const SizedBox(height: 4),
-          if (comment.repliedBy.isNotEmpty) ...[
-            // const Divider(height: 16),
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: comment["replies"].map<Widget>((reply) {
-            //     return Container(
-            //       margin: const EdgeInsets.only(top: 6),
-            //       padding: const EdgeInsets.all(10),
-            //       decoration: BoxDecoration(
-            //         color: Colors.grey[100],
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: Row(
-            //         children: [
-            //           const Icon(Icons.reply, size: 16, color: Colors.grey),
-            //           const SizedBox(width: 6),
-            //           Expanded(
-            //             child: Column(
-            //               crossAxisAlignment: CrossAxisAlignment.start,
-            //               children: [
-            //                 Text(reply["author"],
-            //                     style: const TextStyle(
-            //                         fontWeight: FontWeight.w600, fontSize: 13)),
-            //                 Text(reply["text"],
-            //                     style: const TextStyle(fontSize: 13)),
-            //               ],
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     );
-            //   }).toList(),
-            // )
-          ]
-        ],
-      ),
+        );
+      },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<PostBloc>()
-        ..add(const GetPostRequested("68696da0833b9926d5a1b346")),
+      create: (context) => sl<PostBloc>()..add(GetPostRequested(widget.postid)),
       child: BlocConsumer<PostBloc, PostState>(
           listener: (context, state) {
             if (state is LikeCommentFalier) {
@@ -167,6 +143,10 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                   margin: const EdgeInsets.all(16),
                 ),
               );
+            }
+          else  if (state is delDone) {
+                           Navigator.pop(context, 'refresh');
+
             }
           },
           buildWhen: (previous, current) => current is! LikeCommentFalier,
@@ -187,9 +167,9 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                           const Text("somthig wrong"),
                           IconButton(
                               onPressed: () {
-                                context.read<PostBloc>().add(
-                                    const GetPostRequested(
-                                        "68696da0833b9926d5a1b346"));
+                                context
+                                    .read<PostBloc>()
+                                    .add(GetPostRequested(widget.postid));
                               },
                               icon: const Icon(Icons.refresh))
                         ],
@@ -218,8 +198,9 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                       Row(
                                         children: [
                                           CircleAvatar(
-                                            backgroundImage:
-                                                NetworkImage(avatarUrl),
+                                            backgroundImage: NetworkImage(
+                                              "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                            ),
                                             radius: 20,
                                           ),
                                           const SizedBox(width: 12),
@@ -233,15 +214,21 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.grey[800])),
-                                              Text(time,
+                                              Text(
+                                                  formatPostTime(
+                                                      state.post.createdAt),
                                                   style: TextStyle(
                                                       color: Colors.grey[500],
                                                       fontSize: 12)),
                                             ],
                                           ),
                                           const Spacer(),
-                                          Icon(Icons.more_horiz,
-                                              color: Colors.grey[500])
+                                          IconButton(
+                                            icon: const Icon(Icons.more_horiz),
+                                            onPressed: () =>
+                                                _showPostOptions(context,
+                                                state.post),
+                                          )
                                         ],
                                       ),
                                       const SizedBox(height: 12),
@@ -249,11 +236,16 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                           style: TextStyle(
                                               color: Colors.grey[700])),
                                       const SizedBox(height: 12),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(imageUrl,
-                                            height: 180, fit: BoxFit.cover),
-                                      ),
+                                      state.post.reelFlag
+  ? ReelVideoPlayer(
+      videoUrl:
+        "${EndPoints.baseUrl}/posts/get-file?filesName=${state.post.images.first}&postId=${state.post.id}",
+    )
+  : PostImagesGrid(
+      imageUrls: state.post.images,
+      postId: state.post.id,
+    ),
+
                                       const SizedBox(height: 12),
                                       Row(
                                         mainAxisAlignment:
@@ -261,8 +253,8 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                         children: [
                                           Row(
                                             children: [
-                                         LikeButtonWithCount(
-                                        postId: "68696da0833b9926d5a1b346"),
+                                              LikeButtonWithCount(
+                                                  postId: widget.postid),
                                               const SizedBox(width: 12),
                                               Icon(Icons.chat_bubble_outline,
                                                   size: 18,
@@ -290,7 +282,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
 
                               // const SizedBox(height: 10),
                               ...state.post.comments
-                                  .map((c) => buildComment(c)),
+                                  .map((c) => buildComment(comment: c, postid: widget.postid,)),
                             ],
                           ),
                         ),
@@ -318,7 +310,6 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                               ),
                               const SizedBox(width: 8),
                               IconButton(
-                                
                                 icon: isSubmitting
                                     ? const SizedBox(
                                         width: 20,
@@ -330,14 +321,13 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                         color: Colors.blue),
                                 onPressed: () async {
                                   final text = commentController.text;
-       if (text.trim().isEmpty) return;
+                                  if (text.trim().isEmpty) return;
 
                                   setState(() => isSubmitting = true);
 
-                           
                                   context.read<PostBloc>().add(
                                       AddCommentsRequested(
-                                          text, "68696da0833b9926d5a1b346"));
+                                          text, widget.postid,null));
                                   commentController.clear();
                                   await Future.delayed(
                                       const Duration(milliseconds: 500));
@@ -358,6 +348,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     );
   }
 }
+
 class LikeButtonWithCount extends StatelessWidget {
   final String postId;
   const LikeButtonWithCount({super.key, required this.postId});
@@ -395,5 +386,96 @@ class LikeButtonWithCount extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class PostImagesGrid extends StatelessWidget {
+  final List<String> imageUrls;
+  final String postId;
+
+  const PostImagesGrid(
+      {super.key, required this.imageUrls, required this.postId});
+
+  @override
+  Widget build(BuildContext context) {
+    final int total = imageUrls.length;
+    final String imageUrl =
+        "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[0]}&postId=$postId";
+
+    if (total == 1) {
+      return InkWell(
+        onTap: () {
+          showFullImage(context, imageUrl);
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 350,
+            height: 200,
+            child: Image(
+              fit: BoxFit.cover,
+              image: Image.network(imageUrl).image,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (total == 2) {
+      return Row(
+        children: imageUrls.take(2).map((url) {
+          final String imageUrl =
+              "${EndPoints.baseUrl}/posts/get-file?filesName=$url&postId=$postId";
+
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: InkWell(
+                onTap: () {
+                  showFullImage(context, imageUrl);
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    height: 200,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
+
+    return  GridView.builder(
+  physics: const NeverScrollableScrollPhysics(),
+  shrinkWrap: true,
+  itemCount: imageUrls.length > 4 ? 4 : imageUrls.length,
+  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    mainAxisSpacing: 2,
+    crossAxisSpacing: 2,
+  ),
+  itemBuilder: (context, index) {
+    final String imageUrl =
+        "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[index]}&postId=$postId";
+
+    return InkWell(
+      onTap: () {
+        showFullImage(context, imageUrl);
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  },
+);
+;
   }
 }

@@ -4,9 +4,8 @@
 import 'package:social_media_app/features/post/data/models/post_model/first_layer_comment.dart';
 import 'package:social_media_app/features/post/data/models/post_model/user.dart';
 import 'package:social_media_app/features/post/domian/entities/postDetails_entity.dart';
-import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
 
-class PostModel {
+class PostDetailsModel {
   final String id;
   final String topic;
   final String description;
@@ -15,10 +14,10 @@ class PostModel {
   final int likesCount;
   final bool reelFlag;
   final UserModel publisher;
-  final List<String> comments;
+  final List<CommentModel> comments;
   final DateTime createdAt;
 
-  PostModel({
+  PostDetailsModel({
     required this.id,
     required this.topic,
     required this.description,
@@ -30,11 +29,11 @@ class PostModel {
     required this.comments,
     required this.createdAt,
   });
-  factory PostModel.fromResponse(Map<dynamic, dynamic> json) {
-    return PostModel.fromJson(json['post']);
+  factory PostDetailsModel.fromResponse(Map<dynamic, dynamic> json) {
+    return PostDetailsModel.fromJson(json['post']);
   }
-  factory PostModel.fromJson(Map<dynamic, dynamic> json) {
-    return PostModel(
+  factory PostDetailsModel.fromJson(Map<dynamic, dynamic> json) {
+    return PostDetailsModel(
       id: json['_id'],
       topic: json['topic'] ?? '',
       description: json['description'] ?? '',
@@ -43,20 +42,15 @@ class PostModel {
       likesCount: (json['likes'] as List).length,
       reelFlag: json['reelFlag'] ?? false,
       publisher:json['publisher'] is Map<String, dynamic>? UserModel.fromJson(json['publisher']):UserModel(id: "", userName: "", profileImage: ""),
-      comments:(json['firstLayerComments'] != null &&
-           json['firstLayerComments'] is List &&
-           (json['firstLayerComments'] as List).isNotEmpty &&
-           (json['firstLayerComments'] as List).every((e) => e is String))
-    ? List<String>.from(json['firstLayerComments'])
-    : [],
-      
-      
+      comments: (json['firstLayerComments'] as List)
+          .map((e) => CommentModel.fromJson(e))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
 
-  Post toEntity() {
-    return Post(
+  PostDetails toEntity() {
+    return PostDetails(
       id: id,
       topic: topic,
       description: description,
@@ -66,7 +60,7 @@ class PostModel {
       likesCount: likesCount,
       reelFlag: reelFlag,
       publisher: publisher.toEntity(),
-      comments: comments,
+      comments: comments.map((e) => e.toEntity()).toList(),
       createdAt: createdAt,
     );
   }

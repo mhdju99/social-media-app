@@ -4,7 +4,12 @@ import 'package:social_media_app/features/authentication/presentation/screens/Up
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/topicSelectionPage.dart';
 import 'package:social_media_app/features/post/presentation/screens/homePage.dart';
+import 'package:social_media_app/features/post/presentation/screens/rellsPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/EditProfilePage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/FollowersFollowingPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/edittopicPage.dart';
 import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -18,9 +23,11 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _pages = [
     const Homepage(),
-    const testpage(), // الصفحة الرئيسية للمنشورات
-    const ChatPage1(), // صفحة المحادثة مع OpenAI
-    ProfileScreen(), // صفحة الاستخدام
+    const RellsPage(), /// صفحة المحادثة مع OpenAI/ الصفحة الرئيسية للمنشورات
+    const ChatPage1(), 
+    // EditProfilePage()
+    ProfileScreen(),
+    // // صفحة الاستخدام
     // ProfilePage(), // الصفحة الشخصية أو الإعدادات
   ];
 
