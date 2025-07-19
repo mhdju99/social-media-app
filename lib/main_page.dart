@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_media_app/chatPage.dart';
+import 'package:social_media_app/features/realtime/presentation/screens/chatPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/UploadProfileImagePage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/topicSelectionPage.dart';
@@ -23,8 +23,10 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _pages = [
     const Homepage(),
-    const RellsPage(), /// صفحة المحادثة مع OpenAI/ الصفحة الرئيسية للمنشورات
-    const ChatPage1(), 
+    const RellsPage(),
+
+    /// صفحة المحادثة مع OpenAI/ الصفحة الرئيسية للمنشورات
+    const ChatPage(targetUserId: "6856ba4d544a978c8d4cc199",),
     // EditProfilePage()
     ProfileScreen(),
     // // صفحة الاستخدام

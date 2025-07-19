@@ -182,9 +182,9 @@ class AuthenticationBloc
   }
 
   Future<void> _handleCheckStatus(CheckAuthStateRequested event, emit) async {
-    final isLoggedIn = await checkLoginStatusUseCase();
-    if (isLoggedIn) {
-      emit(checkLoginSuccess());
+    final result = await checkLoginStatusUseCase();
+    if (result['isLoggedIn']) {
+      emit(checkLoginSuccess(token:  result['token']));
     } else {
       emit(AuthenticationInitial());
     }

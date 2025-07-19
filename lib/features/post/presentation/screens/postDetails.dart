@@ -16,6 +16,8 @@ import 'package:social_media_app/features/post/presentation/screens/components/R
 import 'package:social_media_app/features/post/presentation/screens/components/buildComment.dart';
 import 'package:social_media_app/features/post/presentation/screens/modifyPost..dart';
 import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 
 class PostDetailsPage extends StatefulWidget {
   final String postid;
@@ -195,41 +197,62 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                              "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                      InkWell(
+                                        onTap: () {
+                                             if (state.post.isMyPost!) {
+                                            final result = Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      ProfileScreen()),
+                                            );
+                                            return;
+                                          }
+                                          final result = Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    UserProfileScreen(
+                                                        userId:
+                                                          state.  post.publisher.id)),
+                                          );
+                                        },
+                                        child: Row(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                              ),
+                                              radius: 20,
                                             ),
-                                            radius: 20,
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  state.post.publisher.userName,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.grey[800])),
-                                              Text(
-                                                  formatPostTime(
-                                                      state.post.createdAt),
-                                                  style: TextStyle(
-                                                      color: Colors.grey[500],
-                                                      fontSize: 12)),
-                                            ],
-                                          ),
-                                          const Spacer(),
-                                          IconButton(
-                                            icon: const Icon(Icons.more_horiz),
-                                            onPressed: () =>
-                                                _showPostOptions(context,
-                                                state.post),
-                                          )
-                                        ],
+                                            const SizedBox(width: 12),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    state.post.publisher.userName,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey[800])),
+                                                Text(
+                                                    formatPostTime(
+                                                        state.post.createdAt),
+                                                    style: TextStyle(
+                                                        color: Colors.grey[500],
+                                                        fontSize: 12)),
+                                              ],
+                                            ),
+                                            const Spacer(),
+                                            IconButton(
+                                              icon: const Icon(Icons.more_horiz),
+                                              onPressed: () =>
+                                                  _showPostOptions(context,
+                                                  state.post),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
                                       Text(state.post.description,

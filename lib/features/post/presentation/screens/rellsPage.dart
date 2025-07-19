@@ -18,16 +18,12 @@ class RellsPage extends StatefulWidget {
   State<RellsPage> createState() => _RellsPageState();
 }
 
-
-
 class _RellsPageState extends State<RellsPage> {
- 
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          sl<PostBloc>()..add(GetPostsRequested(isRells: true)),
+          sl<PostBloc>()..add(const GetPostsRequested(isRells: true)),
       child: Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
@@ -80,7 +76,7 @@ class _RellsPageState extends State<RellsPage> {
                         onPressed: () {
                           context
                               .read<PostBloc>()
-                              .add(GetPostsRequested(isRells: false));
+                              .add(const GetPostsRequested(isRells: false));
                         },
                         icon: const Icon(Icons.refresh))
                   ],
@@ -90,7 +86,6 @@ class _RellsPageState extends State<RellsPage> {
               final posts = state.posts;
               return CustomScrollView(
                 slivers: [
-                  
                   SliverPadding(
                     padding: const EdgeInsets.all(12.0),
                     sliver: SliverList(
@@ -104,12 +99,10 @@ class _RellsPageState extends State<RellsPage> {
                     ),
                   ),
                 ],
-              ); ;
+              );
             } else {
-              return SizedBox();
+              return const SizedBox();
             }
-
-            ;
           },
         ),
       ),
@@ -185,12 +178,33 @@ class PostCard extends StatelessWidget {
                 const Spacer(),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(post.description, style: TextStyle(color: Colors.grey[700])),
-            const SizedBox(height: 12),
-            ReelVideoPlayer(
-              videoUrl:
-                  "${EndPoints.baseUrl}/posts/get-file?filesName=${post.images.first}&postId=${post.id}",
+            InkWell(
+              onTap: () {
+                final result = Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => PostDetailsPage(postid: post.id)),
+                );
+              },
+              child: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    Text(
+                      post.description,
+                      style: TextStyle(color: Colors.grey[700]),
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 12),
+                    ReelVideoPlayer(
+                      videoUrl:
+                          "${EndPoints.baseUrl}/posts/get-file?filesName=${post.images.first}&postId=${post.id}",
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             Row(

@@ -12,6 +12,7 @@ import 'package:social_media_app/features/authentication/presentation/screens/co
 import 'package:social_media_app/features/authentication/presentation/screens/signUpPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/widgets/buttonText.dart';
+import 'package:social_media_app/main_page.dart';
 
 class LogIn extends StatefulWidget {
   LogIn({super.key});
@@ -33,10 +34,14 @@ class _LogInState extends State<LogIn> {
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (contexts, state) {
             if (state is AuthSuccess) {
+                // context
+                //   .read<ChatBloc>()
+                //   .add(ConnectToSocketEvent(response.token));
+
               Navigator.pushReplacement(
                 contexts,
                 MaterialPageRoute(
-                    builder: (contexts) => UploadProfileImagePage()),
+                    builder: (contexts) => MainPage()),
               );
             } else if (state is AuthFailure) {
               SnackbarHelper.show(context,

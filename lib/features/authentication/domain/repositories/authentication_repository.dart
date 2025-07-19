@@ -27,7 +27,7 @@ abstract class AuthenticationRepository {
     required List<String> preferredTopics,
   });
   Future<void> logOut();
-  Future<bool> isUserLogIn();
+   Future<Map<String, dynamic>> isUserLogIn();
  Future<String?> fetchCachedUserId();
   Future<Either<Failure, void>> requestResetCode({required String email});
   Future<Either<Failure, String>> verifyResetCode(

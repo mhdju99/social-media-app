@@ -9,6 +9,8 @@ import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart'
 import 'package:social_media_app/features/post/presentation/screens/createPost.dart';
 import 'package:social_media_app/features/post/presentation/screens/postDetails.dart'
     hide Widget;
+import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -173,7 +175,8 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                 ],
-              ); ;
+              );
+              ;
             } else {
               return SizedBox();
             }
@@ -230,36 +233,70 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${post.publisher.profileImage}",
+            InkWell(
+              onTap: () {
+                if (post.isMyPost!) {
+                  final result = Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ProfileScreen()),
+                  );
+                  return;
+                }
+                final result = Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          UserProfileScreen(userId: post.publisher.id)),
+                );
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${post.publisher.profileImage}",
+                    ),
+                    radius: 20,
                   ),
-                  radius: 20,
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(post.publisher.userName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800])),
+                      Text(formatPostTime(post.createdAt),
+                          style:
+                              TextStyle(color: Colors.grey[500], fontSize: 12)),
+                    ],
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                final result = Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => PostDetailsPage(postid: post.id)),
+                );
+              },
+              child: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(post.publisher.userName,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800])),
-                    Text(formatPostTime(post.createdAt),
-                        style:
-                            TextStyle(color: Colors.grey[500], fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Text(post.description,
+                        style: TextStyle(color: Colors.grey[700])),
+                    const SizedBox(height: 12),
+                    PostImagesGrid(
+                      imageUrls: post.images,
+                      postId: post.id,
+                    ),
                   ],
                 ),
-                const Spacer(),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(post.description, style: TextStyle(color: Colors.grey[700])),
-            const SizedBox(height: 12),
-            PostImagesGrid(
-              imageUrls: post.images,
-              postId: post.id,
+              ),
             ),
             const SizedBox(height: 12),
             Row(

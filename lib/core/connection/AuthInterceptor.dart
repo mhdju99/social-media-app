@@ -9,6 +9,7 @@ class AuthInterceptor extends Interceptor {
     final localDataSource = sl<AuthenticationLocalDataSource>();
     final token = await localDataSource.getTokenSec();
     if (token != null && token.isNotEmpty) {
+      print(token);
       options.headers['Authorization'] = '$token';
     }
 

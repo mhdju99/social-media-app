@@ -27,10 +27,14 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   });
 
   @override
-  Future<bool> isUserLogIn() async {
+  Future<Map<String, dynamic>> isUserLogIn() async {
     final String? token = await local.getTokenSec();
     final result = token != null && token.isNotEmpty;
-    return result;
+    return  {
+      'isLoggedIn': result,
+      'token': token,
+    };
+    ;
   }
 
   @override

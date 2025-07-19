@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/databases/cache/cache_helper.dart';
+import 'package:social_media_app/core/injection_container%203.dart';
 import 'package:social_media_app/core/injection_container%20copy%202.dart';
 import 'package:social_media_app/core/injection_container%20copy.dart';
 import 'package:social_media_app/core/injection_container.dart';
@@ -9,10 +10,11 @@ import 'package:social_media_app/features/authentication/presentation/screens/sp
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = SimpleBlocObserver();
+  // Bloc.observer = SimpleBlocObserver();
   await init();
   await init2();
   await init3();
+  await init4();
   await CacheHelper.init(); 
 
   runApp(const MyApp());

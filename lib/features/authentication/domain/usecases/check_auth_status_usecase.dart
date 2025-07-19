@@ -5,7 +5,7 @@ class CheckAuthStatusUseCase {
 
   CheckAuthStatusUseCase(this.repository);
 
-  Future<bool> call() {
+   Future<Map<String, dynamic>> call() {
     return repository.isUserLogIn();
   }
 }

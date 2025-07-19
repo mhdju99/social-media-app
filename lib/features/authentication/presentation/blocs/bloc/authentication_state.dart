@@ -28,7 +28,12 @@ class AuthFailure extends AuthenticationState {
 
 class AuthImageUploadSuccess extends AuthenticationState {}
 
-class checkLoginSuccess extends AuthenticationState {}
+class checkLoginSuccess extends AuthenticationState {
+  String token;
+  checkLoginSuccess({
+  required  this.token,
+  });
+}
 
 class AuthImageUploadFailure extends AuthenticationState {
   final String message;
