@@ -29,18 +29,8 @@ class _RellsPageState extends State<RellsPage> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 1,
-          title: Text('Rells', style: TextStyle(color: Colors.grey[800])),
+          title: Text('Reels', style: TextStyle(color: Colors.grey[800])),
           centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.grey[600]),
-            onPressed: () {},
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.search, color: Colors.grey[600]),
-              onPressed: () {},
-            ),
-          ],
         ),
         body: BlocConsumer<PostBloc, PostState>(
           listener: (context, state) {
@@ -84,21 +74,28 @@ class _RellsPageState extends State<RellsPage> {
               );
             } else if (state is PostsLoaded) {
               final posts = state.posts;
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.all(12.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final post = posts[index];
-                          return PostCard(post: post);
-                        },
-                        childCount: posts.length,
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context
+                      .read<PostBloc>()
+                      .add(const GetPostsRequested(isRells: true));
+                },
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.all(12.0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final post = posts[index];
+                            return PostCard(post: post);
+                          },
+                          childCount: posts.length,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             } else {
               return const SizedBox();

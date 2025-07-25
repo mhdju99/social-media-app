@@ -20,6 +20,7 @@ import 'package:social_media_app/features/post/domian/usecases/get_posts.dart';
 import 'package:social_media_app/features/post/domian/usecases/like_unlike_post.dart';
 import 'package:social_media_app/features/post/domian/usecases/modify_post.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_media_app/features/profile/domain/usecases/GetUserProfileUsecase.dart';
 
 final sl = GetIt.instance;
 
@@ -38,7 +39,8 @@ Future<void> init2() async {
     likeUnlikeCommentUseCase: sl(),
     deletePost: sl(),
 modifyPost: sl(),
-getPosts:  sl()
+getPosts:  sl(),
+getUserProfileUsecase:  sl()
     ),
   );
   sl.registerLazySingleton(() => GetPostDetails( sl()));
@@ -54,6 +56,7 @@ sl.registerLazySingleton<GetUserIdUseCase>(
   sl.registerLazySingleton(() => DeletePost(sl()));
   sl.registerLazySingleton(() => ModifyPost(sl()));
   sl.registerLazySingleton(() => GetPosts(sl()));
+  sl.registerLazySingleton(() => GetUserProfileUsecase(sl()));
 
   sl.registerLazySingleton<PostRepository>(
     () => PostRepositoryImpl( sl()),

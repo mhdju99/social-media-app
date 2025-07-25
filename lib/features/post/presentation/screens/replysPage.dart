@@ -1,23 +1,27 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/constants/UserActions%20.dart';
+import 'package:social_media_app/core/constants/category.dart';
 
 import 'package:social_media_app/core/injection_container%20copy%202.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomTextField.dart';
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_media_app/features/post/presentation/screens/components/buildComment.dart';
+import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 
 class Replyspage extends StatefulWidget {
   final List<String> commentsIds;
   final String postid;
+  final String topic;
   final Comment mainComment;
 
   const Replyspage({
     super.key,
     required this.commentsIds,
     required this.mainComment,
-    required this.postid,
+    required this.postid, required this.topic,
   });
 
   @override
@@ -79,6 +83,7 @@ class _ReplyspageState extends State<Replyspage> {
                       buildComment(
                         comment: widget.mainComment,
                         postid: widget.postid,
+                        topic: widget.topic,
                       ),
                       const SizedBox(height: 2),
                       (state.replies != null)
@@ -91,6 +96,7 @@ class _ReplyspageState extends State<Replyspage> {
                                   itemBuilder: (context, index) {
                                     final comment = state.replies![index];
                                     return buildComment(
+                                      topic: widget.topic,
                                       comment: comment,
                                       postid: widget.postid,
                                     );
@@ -142,7 +148,9 @@ class _ReplyspageState extends State<Replyspage> {
                                 context.read<PostBloc>().add(
                                     AddCommentsRequested(text, widget.postid,
                                         widget.mainComment.id));
-
+                                context.read<TrackerBloc>().add(LogActionEvent(
+                                    category: category[widget.topic]!,
+                                    action: UserActions.comment));
                                 commentController.clear();
                                 await Future.delayed(
                                     const Duration(milliseconds: 500));

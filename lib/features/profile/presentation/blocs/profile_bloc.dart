@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:social_media_app/features/authentication/domain/repositories/authentication_repository.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/add_profile_image_usecase.dart';
@@ -26,7 +27,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   GetUserIdUseCase getUserIdUseCase;
   final AddProfileImageUsecase addProfileImageUsecase;
 
-  ProfileBloc( {
+  ProfileBloc({
     required this.blockUnblockUsecase,
     required this.getUserIdUseCase,
     required this.changePasswordUsecase,
@@ -34,7 +35,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.getUserProfileUsecase,
     required this.getPhotoAndNameUsecase,
     required this.modifyProfileUsecase,
-  required  this.addProfileImageUsecase,
+    required this.addProfileImageUsecase,
   }) : super(ProfileInitial()) {
     on<GetMyProfileEvent>((event, emit) async {
       emit(ProfileLoading());
@@ -47,10 +48,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
     on<GetUserProfileEvent>((event, emit) async {
       emit(ProfileLoading());
+      final userId = await getUserIdUseCase();
+
       final result = await getUserProfileUsecase(event.userId);
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
-        (userProfile) => emit(ProfileSuccess(userProfile)),
+        (userProfile) {
+
+          debugPrint(userProfile.toString());
+          bool isfollow = userProfile.followers.contains(userId);
+                              debugPrint("isfollow");
+
+                    debugPrint(isfollow.toString());
+
+          emit(ProfileSuccess(userProfile.copyWith(isfollow: isfollow)));
+        },
       );
     });
 
@@ -66,7 +78,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ModifyProfileEvent>((event, emit) async {
       emit(ProfileLoading());
 
-        if (event.photo != null) {
+      if (event.photo != null) {
         final imageResult = await addProfileImageUsecase(event.photo!);
         if (imageResult.isLeft()) {
           return emit(
@@ -113,11 +125,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     on<FollowUnfollowUserEvent>((event, emit) async {
-      emit(ProfileLoading());
       final result = await followUnfollowUsecase(event.userId);
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
-        (_) => emit(ProfileSuccess("تم تعديل حالة المتابعة")),
+        (_) {
+          if (state is ProfileSuccess<UserProfile>) {
+            final currentState = state as ProfileSuccess;
+            final UserProfile user = currentState.data;
+            final updatedUser = user.copyWith(isfollow: !user.isfollow);
+            emit(ProfileSuccess(updatedUser));
+          }
+        },
       );
     });
   }

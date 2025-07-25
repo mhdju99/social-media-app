@@ -14,3 +14,4 @@ class Location {
         'city': city,
       };
 }
+    

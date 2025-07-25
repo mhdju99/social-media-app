@@ -4,12 +4,15 @@ import 'package:social_media_app/core/injection_container.dart';
 import 'package:social_media_app/core/utils/validators.dart';
 import 'package:social_media_app/features/authentication/domain/params/register_params.dart';
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
+import 'package:social_media_app/features/authentication/presentation/screens/UploadProfileImagePage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomButton.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomTextField.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/ReusableDatePickerField.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/YesNoSelecto.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/widgets/buttonText.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_event.dart';
 
 class SignUP extends StatefulWidget {
   const SignUP({super.key});
@@ -35,6 +38,7 @@ class _SignUPState extends State<SignUP> {
   bool? certifiedDoctor = false;
   // AuthController authControlar = Get.put(AuthController());
   String? selectedCountry;
+  String? gender;
 
   bool showSecondPage = false;
 
@@ -53,9 +57,12 @@ class _SignUPState extends State<SignUP> {
         body: BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
             if (state is AuthSuccess) {
+              context.read<ChatBloc>().add(ConnectToSocketEvent());
+
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const testpage()),
+                MaterialPageRoute(
+                    builder: (context) => const UploadProfileImagePage()),
               );
             } else if (state is AuthFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -112,9 +119,11 @@ class _SignUPState extends State<SignUP> {
           Column(
             children: [
               DoctorPatientSelector(
-                title: "User Type :",
-                initialValue: certifiedDoctor,
-                onSaved: (val) => certifiedDoctor = val,
+                items: {"Doctor": Icons.medical_services, " Patient": Icons.person_outline
+                },
+                title: "user type:",
+                // initialValue: certifiedDoctor,
+                onSaved: (val) => certifiedDoctor = (val=="Doctor"),
                 validator: (val) =>
                     val == null ? 'Please choose an option' : null,
               ),
@@ -152,6 +161,18 @@ class _SignUPState extends State<SignUP> {
                     date == null ? 'يرجى اختيار تاريخ الميلاد' : null,
               ),
               const SizedBox(
+                height: 9,
+              ),
+              DoctorPatientSelector(
+                items: {"male": Icons.male, " female": Icons.female
+                },
+                // title: "user type:",
+                // initialValue: certifiedDoctor,
+                onSaved: (val) => gender=val,
+                validator: (val) =>
+                    val == null ? 'Please choose an option' : null,
+              ),
+              SizedBox(
                 height: 9,
               ),
               CustomTextField(
@@ -258,10 +279,10 @@ class _SignUPState extends State<SignUP> {
           builder: (context, state) {
             return CustomButton(
                 child: state is AuthLoading
-                    ? CircularProgressIndicator(
+                    ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
-                    : buttonText(
+                    : const buttonText(
                         label: "Sign Up",
                       ),
                 onPressed: () {
@@ -278,6 +299,7 @@ class _SignUPState extends State<SignUP> {
                             password: password!,
                             country: country!,
                             city: city!,
+                            gender: gender!,
                             preferredTopics: [])));
                   }
                 });

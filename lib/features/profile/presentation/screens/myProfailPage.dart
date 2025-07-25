@@ -7,12 +7,14 @@ import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/injection_container%20copy.dart';
 import 'package:social_media_app/core/utils/image_viewer_helper.dart';
 import 'package:social_media_app/core/utils/post_helper.dart';
+import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_media_app/features/post/presentation/screens/postDetails.dart';
 import 'package:social_media_app/features/profile/domain/entities/user_entity.dart';
 import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:social_media_app/features/profile/presentation/screens/EditProfilePage.dart';
 import 'package:social_media_app/features/profile/presentation/screens/FollowersFollowingPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/components/CustomDrawer.dart';
 import 'package:social_media_app/features/profile/presentation/screens/edittopicPage.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -26,19 +28,34 @@ class ProfileScreen extends StatelessWidget {
         listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
+
+            
+            endDrawer: const CustomDrawer(),
             appBar: AppBar(
+              actions: [
+                SizedBox(width: 10,),
+             InkWell(
+                    onTap: () {
+                      context
+                          .read<ProfileBloc>()
+                          .add(const GetMyProfileEvent());
+                    },
+                    child: const Icon(Icons.refresh, color: Colors.black)),
+                    Builder(
+                  builder: (context) => IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  ),
+                )
+              ],
               title: Text(
                 state is ProfileSuccess<UserProfile> ? state.data.userName : "",
                 style: const TextStyle(color: Colors.black),
               ),
               backgroundColor: Colors.white,
               elevation: 1,
-              actions: const [
-                Icon(Icons.menu, color: Colors.black),
-                SizedBox(width: 16),
-              ],
             ),
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.grey[200],
             body: () {
               if (state is ProfileLoading) {
                 return const Center(child: CircularProgressIndicator());
@@ -121,6 +138,8 @@ class ProfileScreen extends StatelessWidget {
                   count: user.followers.length.toString(),
                   label: 'Followers',
                   ontap: () {
+                    print("💘");
+                    print(user.followers);
                     if (user.followers.isNotEmpty) {
                       Navigator.push(
                         context,
@@ -137,6 +156,8 @@ class ProfileScreen extends StatelessWidget {
                   label: 'Following',
                   ontap: () {
                     if (user.following.isNotEmpty) {
+                      print("💘");
+                      print(user.following);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -217,6 +238,8 @@ class ProfileScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GridView.builder(
+     // يمنع التمرير
+
         itemCount: filteredPosts.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,

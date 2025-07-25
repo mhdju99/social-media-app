@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:social_media_app/core/databases/api/api_consumer.dart';
 import 'package:social_media_app/features/authentication/domain/repositories/authentication_repository.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/check_auth_status_usecase.dart';
 
 import 'package:social_media_app/features/profile/data/data_sources/profile_data_source.dart';
 import 'package:social_media_app/features/profile/data/repositories/profile_repository_impl.dart';
@@ -18,11 +19,16 @@ import 'package:social_media_app/features/realtime/data/data_sources/realtime_da
 import 'package:social_media_app/features/realtime/data/repositories/realtime_repository_impl.dart';
 import 'package:social_media_app/features/realtime/domain/repositories/realtime_repository.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/connect_to_socket.dart';
+import 'package:social_media_app/features/realtime/domain/usecases/get_All_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_message_stream.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_user_online_status_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/send_message.dart';
+import 'package:social_media_app/features/realtime/domain/usecases/stream_user_offline_usecase.dart';
+import 'package:social_media_app/features/realtime/domain/usecases/stream_user_online_usecase.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
+import 'package:social_media_app/features/user_tracking/tracker_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -35,6 +41,11 @@ Future<void> init4() async {
       sendMessage: sl() ,
       getChatUseCase: sl() ,
       getUserOnlineStatusUseCase: sl() ,
+      getAllChatUsecase: sl() ,
+      userOfflineStream: sl() ,
+      userOnlineStream: sl() ,
+      getUserIdUseCase: sl() ,
+      checkLoginStatusUseCase: sl() ,
 
 
 
@@ -45,6 +56,16 @@ Future<void> init4() async {
   sl.registerLazySingleton(() => SendMessageUseCase( sl()));
   sl.registerLazySingleton(() => GetChatUseCase( sl()));
   sl.registerLazySingleton(() => GetUserOnlineStatusUseCase( sl()));
+  sl.registerLazySingleton(() => GetAllChatUsecase( sl()));
+  sl.registerLazySingleton(() => StreamUserOnlineUseCase(sl()));
+  sl.registerLazySingleton(() => StreamUserOfflineUseCase(sl()));
+if (!sl.isRegistered<GetUserIdUseCase>()) {
+    sl.registerLazySingleton(() => GetUserIdUseCase(sl()));
+  }
+  if (!sl.isRegistered<CheckAuthStatusUseCase>()) {
+    sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
+  }
+
 
 
   sl.registerLazySingleton<RealtimeRepository>(
@@ -54,5 +75,15 @@ Future<void> init4() async {
     () => RealtimeDataSourceImpl(api: sl<ApiConsumer>()),
   );
 
+    sl.registerFactory(
+    () => TrackerBloc(
+      repository: sl()
+    
+    ),
+    
+  );
   
+  sl.registerLazySingleton<TrackerRepository>(
+    () => TrackerRepository(api: sl()),
+  );
 }

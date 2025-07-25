@@ -6,82 +6,89 @@ import 'package:social_media_app/features/realtime/data/models/chat_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 abstract class RealtimeDataSource {
-    Future<ChatModel> getChat(String targetUserId);
+  Future<ChatModel> getChat(String targetUserId);
+  Future<List<ChatModel>> getAllChats();
 
-  Future<bool> isUserOnline(String targetUserId);
+  Future<Map<String, dynamic>> isUserOnline(String targetUserId);
   Future<void> connect(String token);
   void sendMessage(String to, String content);
+
   Stream<Map<String, dynamic>> get messageStream;
-    Stream<List<dynamic>> get initialNotifications;
+  Stream<List<dynamic>> get initialNotifications;
   Stream<Map<String, dynamic>> get newNotification;
-  // void dispose();
+
+  // الجدد:
+  Stream<String> get userOnline;
+  Stream<Map<String, dynamic>> get userOffline;
+
   void disconnect();
 }
 
-/// RealtimeDataSourceImpl is the concrete implementation of the RealtimeDataSource
-/// interface.
-/// This class implements the methods defined in RealtimeDataSource to fetch
-/// data from a remote API or other data sources.
 class RealtimeDataSourceImpl implements RealtimeDataSource {
-    late IO.Socket _socket;
+  late IO.Socket _socket;
   final _messageController = StreamController<Map<String, dynamic>>.broadcast();
 
   final _initialNotifController = StreamController<List<dynamic>>.broadcast();
   final _newNotifController =
       StreamController<Map<String, dynamic>>.broadcast();
+
+  // الجدد:
+  final _userOnlineController = StreamController<String>.broadcast();
+  final _userOfflineController =
+      StreamController<Map<String, dynamic>>.broadcast();
+
   bool _isConnected = false;
 
-    final ApiConsumer api;
-RealtimeDataSourceImpl({
+  final ApiConsumer api;
+  RealtimeDataSourceImpl({
     required this.api,
-    // required this.local,
   });
 
-   @override
-
-
+  @override
   Future<ChatModel> getChat(String targetUserId) async {
     final uri = '${EndPoints.baseUrl}/chats';
-    final response = await api.get(uri,
-    queryParameters: {
-"targetUserId": targetUserId
-    });
-       return ChatModel.fromJson(response.data['chat']);
-   
-  }
-
-
-  @override
-  Future<bool> isUserOnline(String targetUserId) async {
-    final uri =
-        '${EndPoints.baseUrl}/chat/user-online';
     final response =
         await api.get(uri, queryParameters: {"targetUserId": targetUserId});
-       return response.data['onlineFlag'] ?? false;
+    return ChatModel.fromJson(response.data['chat']);
+  }
 
+  @override
+  Future<List<ChatModel>> getAllChats() async {
+    final uri = await EndPoints.getAllChatsEndPoint;
+    final response = await api.get(uri);
+    final data = response.data['chats'] as List;
+    print("💨$data");
+    return data.map((json) => ChatModel.fromJson(json)).toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> isUserOnline(String targetUserId) async {
+    final uri = '${EndPoints.baseUrl}/chats/user-online';
+    final response =
+        await api.get(uri, queryParameters: {"targetUserId": targetUserId});
+    return response.data;
   }
 
   @override
   Future<void> connect(String token) async {
-    _socket = IO.io('${EndPoints.socetUrl}', <String, dynamic>{
+    _socket = IO.io('${EndPoints.socketUrl}', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
-    print("sSSSSSSSS");
 
     _socket.connect();
 
     _socket.onConnect((_) {
       _isConnected = true;
       print('✅ Connected to socket server');
+      print("qqqqqqqqqqqqqqq");
       _socket.emit('connected', {'token': token});
     });
 
     _socket.on('message', (data) {
-            print('✅ message resive $data');
-
       _messageController.add(Map<String, dynamic>.from(data));
     });
+
     _socket.on("initial_notifications", (data) {
       _initialNotifController.add(List<dynamic>.from(data));
     });
@@ -89,6 +96,22 @@ RealtimeDataSourceImpl({
     _socket.on("new_notification", (notif) {
       _newNotifController.add(Map<String, dynamic>.from(notif));
     });
+
+    // 📌 الجدد:
+    _socket.on("user_online", (data) {
+      print(data);
+
+      final userId = data["userId"];
+      _userOnlineController.add(userId);
+    });
+
+    _socket.on("user_offline", (data) {
+      print(data);
+
+      final map = Map<String, dynamic>.from(data);
+      _userOfflineController.add(map);
+    });
+
     _socket.on('disconnect', (_) {
       _isConnected = false;
       print('🔌 Socket disconnected.');
@@ -106,8 +129,6 @@ RealtimeDataSourceImpl({
         'to': to,
         'content': content,
       });
-      print('✅ message send');
-
     } else {
       print('⚠️ Cannot send message: Socket is not connected.');
     }
@@ -115,6 +136,7 @@ RealtimeDataSourceImpl({
 
   @override
   Stream<Map<String, dynamic>> get messageStream => _messageController.stream;
+
   @override
   Stream<List<dynamic>> get initialNotifications =>
       _initialNotifController.stream;
@@ -122,18 +144,17 @@ RealtimeDataSourceImpl({
   @override
   Stream<Map<String, dynamic>> get newNotification =>
       _newNotifController.stream;
+
+  @override
+  Stream<String> get userOnline => _userOnlineController.stream;
+
+  @override
+  Stream<Map<String, dynamic>> get userOffline => _userOfflineController.stream;
+
   @override
   void disconnect() {
     if (_isConnected) {
-      _socket.disconnect(); // يبقي socket قابل للإعادة لاحقًا
-      print('🛑 Socket connection closed temporarily.');
+      _socket.disconnect();
     }
   }
-
-  // @override
-  // void dispose() {
-  //   _socket.dispose(); // يمنع إعادة الاتصال
-  //   _messageController.close();
-  //   print('🧹 Socket and stream cleaned up.');
-  // }
 }

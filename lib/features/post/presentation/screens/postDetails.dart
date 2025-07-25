@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:social_media_app/core/constants/UserActions%20.dart';
+import 'package:social_media_app/core/constants/category.dart';
 import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/injection_container%20copy.dart';
 import 'package:social_media_app/core/utils/image_viewer_helper.dart';
@@ -18,6 +20,7 @@ import 'package:social_media_app/features/post/presentation/screens/modifyPost..
 import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
 import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
+import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 
 class PostDetailsPage extends StatefulWidget {
   final String postid;
@@ -33,7 +36,6 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
 
   bool isSubmitting = false;
 
-
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -44,8 +46,10 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     }
   }
 
-  void _showPostOptions(BuildContext contexta,
-    PostDetails post,) {
+  void _showPostOptions(
+    BuildContext contexta,
+    PostDetails post,
+  ) {
     showModalBottomSheet(
       context: contexta,
       shape: const RoundedRectangleBorder(
@@ -78,16 +82,16 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                       fontSize: 14,
                     ),
                   ),
-                  onTap: () async{
-                                                            Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
+                  onTap: () async {
+                    Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
 
-                   final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => ModifyPostPage(
-                          post:post ,
-                        )),
-                  );
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => ModifyPostPage(
+                                post: post,
+                              )),
+                    );
                     if (result == 'refresh') {
                       contexta
                           .read<PostBloc>()
@@ -106,12 +110,9 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                     style: TextStyle(fontSize: 14, color: Colors.red),
                   ),
                   onTap: () {
-                                        Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
+                    Navigator.pop(context, 'refresh'); // إغلاق الـ BottomSheet
 
-                           contexta
-                        .read<PostBloc>()
-                        .add(DeletePostRequested(post.id));
-
+                    contexta.read<PostBloc>().add(DeletePostRequested(post.id));
                   },
                 ),
               ),
@@ -122,8 +123,6 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +144,8 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                   margin: const EdgeInsets.all(16),
                 ),
               );
-            }
-          else  if (state is delDone) {
-                           Navigator.pop(context, 'refresh');
-
+            } else if (state is delDone) {
+              Navigator.pop(context, 'refresh');
             }
           },
           buildWhen: (previous, current) => current is! LikeCommentFalier,
@@ -178,192 +175,210 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                       ),
                     );
                   } else if (state is PostdetailsLoaded) {
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: ListView(
-                            controller: _scrollController,
-                            padding: const EdgeInsets.all(12),
-                            children: [
-                              // 🔷 Main Post Content
-                              Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16)),
-                                elevation: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                             if (state.post.isMyPost!) {
+                    return SafeArea(
+                      bottom: true,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.all(3),
+                              children: [
+                                // 🔷 Main Post Content
+                                Card(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
+                                  elevation: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            if (state.post.isMyPost!) {
+                                              final result = Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        const ProfileScreen()),
+                                              );
+                                              return;
+                                            }
                                             final result = Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (_) =>
-                                                      ProfileScreen()),
+                                                      UserProfileScreen(
+                                                          userId: state.post
+                                                              .publisher.id)),
                                             );
-                                            return;
-                                          }
-                                          final result = Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) =>
-                                                    UserProfileScreen(
-                                                        userId:
-                                                          state.  post.publisher.id)),
-                                          );
-                                        },
-                                        child: Row(
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundImage: NetworkImage(
-                                                "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
-                                              ),
-                                              radius: 20,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                    state.post.publisher.userName,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.grey[800])),
-                                                Text(
-                                                    formatPostTime(
-                                                        state.post.createdAt),
-                                                    style: TextStyle(
-                                                        color: Colors.grey[500],
-                                                        fontSize: 12)),
-                                              ],
-                                            ),
-                                            const Spacer(),
-                                            IconButton(
-                                              icon: const Icon(Icons.more_horiz),
-                                              onPressed: () =>
-                                                  _showPostOptions(context,
-                                                  state.post),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(state.post.description,
-                                          style: TextStyle(
-                                              color: Colors.grey[700])),
-                                      const SizedBox(height: 12),
-                                      state.post.reelFlag
-  ? ReelVideoPlayer(
-      videoUrl:
-        "${EndPoints.baseUrl}/posts/get-file?filesName=${state.post.images.first}&postId=${state.post.id}",
-    )
-  : PostImagesGrid(
-      imageUrls: state.post.images,
-      postId: state.post.id,
-    ),
-
-                                      const SizedBox(height: 12),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
+                                          },
+                                          child: Row(
                                             children: [
-                                              LikeButtonWithCount(
-                                                  postId: widget.postid),
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                                ),
+                                                radius: 20,
+                                              ),
                                               const SizedBox(width: 12),
-                                              Icon(Icons.chat_bubble_outline,
-                                                  size: 18,
-                                                  color: Colors.grey[500]),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                  state.post.comments.length
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      color: Colors.grey[600])),
-                                              const SizedBox(width: 12),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                      state.post.publisher
+                                                          .userName,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Colors.grey[800])),
+                                                  Text(
+                                                      formatPostTime(
+                                                          state.post.createdAt),
+                                                      style: TextStyle(
+                                                          color: Colors.grey[500],
+                                                          fontSize: 12)),
+                                                ],
+                                              ),
+                                              const Spacer(),
+                                              IconButton(
+                                                icon:
+                                                    const Icon(Icons.more_horiz),
+                                                onPressed: () => _showPostOptions(
+                                                    context, state.post),
+                                              )
                                             ],
                                           ),
-                                        ],
-                                      )
-                                    ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(state.post.description,
+                                            style: TextStyle(
+                                                color: Colors.grey[700])),
+                                        const SizedBox(height: 12),
+                                        state.post.reelFlag
+                                            ? ReelVideoPlayer(
+                                                videoUrl:
+                                                    "${EndPoints.baseUrl}/posts/get-file?filesName=${state.post.images.first}&postId=${state.post.id}",
+                                              )
+                                            : PostImagesGrid(
+                                                imageUrls: state.post.images,
+                                                postId: state.post.id,
+                                              ),
+                                        const SizedBox(height: 12),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                LikeButtonWithCount(
+                                                    postId: widget.postid),
+                                                const SizedBox(width: 12),
+                                                Icon(Icons.chat_bubble_outline,
+                                                    size: 18,
+                                                    color: Colors.grey[500]),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                    state.post.comments.isEmpty
+                                                        ? ''
+                                                        : state
+                                                            .post.comments.length
+                                                            .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.grey[600])),
+                                                const SizedBox(width: 12),
+                                              ],
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-
-                              const SizedBox(height: 10),
-                              // const Text("Comments",
-                              //     style:
-                              //         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
-                              // const SizedBox(height: 10),
-                              ...state.post.comments
-                                  .map((c) => buildComment(comment: c, postid: widget.postid,)),
-                            ],
+                      
+                                const SizedBox(height: 10),
+                                // const Text("Comments",
+                                //     style:
+                                //         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      
+                                // const SizedBox(height: 10),
+                                ...state.post.comments.map((c) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: buildComment(
+                                        comment: c,
+                                        postid: widget.postid,
+                                        topic: state.post.topic,
+                                      ),
+                                    )),
+                              ],
+                            ),
                           ),
-                        ),
-
-                        // 🔷 Comment Input
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                                top: BorderSide(color: Colors.grey.shade300)),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4),
-                                  child: CustomTextField(
-                                    prefixIcon: const Icon(Icons.message),
-                                    text: "   Add a comment...",
-                                    controller: commentController,
+                      
+                          // 🔷 Comment Input
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                  top: BorderSide(color: Colors.grey.shade300)),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: CustomTextField(
+                                      prefixIcon: const Icon(Icons.message),
+                                      text: "   Add a comment...",
+                                      controller: commentController,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: isSubmitting
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2),
-                                      )
-                                    : const Icon(Icons.send,
-                                        color: Colors.blue),
-                                onPressed: () async {
-                                  final text = commentController.text;
-                                  if (text.trim().isEmpty) return;
-
-                                  setState(() => isSubmitting = true);
-
-                                  context.read<PostBloc>().add(
-                                      AddCommentsRequested(
-                                          text, widget.postid,null));
-                                  commentController.clear();
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 500));
-
-                                  setState(() => isSubmitting = false);
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                      (_) => _scrollToBottom());
-                                },
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: isSubmitting
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                        )
+                                      : const Icon(Icons.send,
+                                          color: Colors.blue),
+                                  onPressed: () async {
+                                    final text = commentController.text;
+                                    if (text.trim().isEmpty) return;
+                      
+                                    setState(() => isSubmitting = true);
+                      
+                                    context.read<PostBloc>().add(
+                                        AddCommentsRequested(
+                                            text, widget.postid, null));
+                                    context.read<TrackerBloc>().add(
+                                        LogActionEvent(
+                                            category: category[state.post.topic]!,
+                                            action: UserActions.comment));
+                                    commentController.clear();
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 500));
+                      
+                                    setState(() => isSubmitting = false);
+                                    WidgetsBinding.instance.addPostFrameCallback(
+                                        (_) => _scrollToBottom());
+                                  },
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     );
                   }
                 }());
@@ -472,33 +487,32 @@ class PostImagesGrid extends StatelessWidget {
       );
     }
 
-    return  GridView.builder(
-  physics: const NeverScrollableScrollPhysics(),
-  shrinkWrap: true,
-  itemCount: imageUrls.length > 4 ? 4 : imageUrls.length,
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-    mainAxisSpacing: 2,
-    crossAxisSpacing: 2,
-  ),
-  itemBuilder: (context, index) {
-    final String imageUrl =
-        "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[index]}&postId=$postId";
-
-    return InkWell(
-      onTap: () {
-        showFullImage(context, imageUrl);
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-        ),
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: imageUrls.length > 4 ? 4 : imageUrls.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 2,
+        crossAxisSpacing: 2,
       ),
+      itemBuilder: (context, index) {
+        final String imageUrl =
+            "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[index]}&postId=$postId";
+
+        return InkWell(
+          onTap: () {
+            showFullImage(context, imageUrl);
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      },
     );
-  },
-);
-;
   }
 }

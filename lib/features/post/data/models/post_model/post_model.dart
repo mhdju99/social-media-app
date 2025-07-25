@@ -16,7 +16,7 @@ class PostModel {
   final bool reelFlag;
   final UserModel publisher;
   final List<String> comments;
-  final DateTime createdAt;
+  final DateTime createdAt; 
 
   PostModel({
     required this.id,

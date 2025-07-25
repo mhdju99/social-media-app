@@ -21,6 +21,8 @@ abstract class AuthenticationRepository {
     required String lastName,
     required String birthDate,
     required String email,
+          required String gender,
+
     required String password,
     required String country,
     required String city,

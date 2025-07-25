@@ -6,6 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
+import 'package:social_media_app/features/profile/domain/usecases/GetUserProfileUsecase.dart';
 import 'package:test/test.dart';
 
 import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
@@ -39,8 +40,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   DeletePost deletePost;
   ModifyPost modifyPost;
   GetPosts getPosts;
+  GetUserProfileUsecase getUserProfileUsecase;
   PostBloc({
     required this.getPostDetails,
+    required this.getUserProfileUsecase,
     required this.likeUnlikePost,
     required this.getUserIdUseCase,
     required this.addComment,
@@ -94,9 +97,20 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       );
     });
 
-       on<GetPostsRequested>((GetPostsRequested event, emit) async {
+    on<GetPostsRequested>((GetPostsRequested event, emit) async {
       emit(PostLoading());
       final userId = await getUserIdUseCase();
+      List<String> following = [];
+
+      final me = await getUserProfileUsecase((userId != null) ? userId : "");
+      me.fold(
+        (l) {
+          emit(PostError(l.errMessage));
+        },
+        (me) {
+          following = me.following;
+        },
+      );
       final result = await getPosts(event.isRells);
 
       result.fold(
@@ -104,16 +118,20 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           emit(PostError(l.errMessage));
         },
         (posts) {
-          final updatedPosts = posts.where((post) => post.reelFlag == event.isRells).map((post) {
+          final updatedPosts =
+              posts.where((post) => post.reelFlag == event.isRells).map((post) {
             final isMyPost = post.publisher.id == userId;
             final isLikedPost = post.likes.contains(userId);
+            final isFollowME = following.contains(post.publisher.id);
 
-            return post.copyWith(
-                isMyPost: isMyPost, isLiked: isLikedPost);
+            return post.copyWith(isMyPost: isMyPost, isLiked: isLikedPost,
+            publisher: post.publisher.copyWith(
+              isfollowMe: isFollowME
+            )
+            );
           }).toList();
 
           emit(PostsLoaded(updatedPosts));
-     
         },
       );
     });
@@ -134,7 +152,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         },
       );
     });
- on<ToggleLikePostRequested>((event, emit) async {
+    on<ToggleLikePostRequested>((event, emit) async {
       if (state is PostdetailsLoaded) {
         final currentState = state as PostdetailsLoaded;
         final post = currentState.post;
@@ -180,7 +198,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         );
       }
     });
-
 
     on<DeleteCommentEvent>((event, emit) async {
       final result = await deleteCommentUseCase(event.commentId);
@@ -286,7 +303,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<GetRepliesEvent>((event, emit) async {
       final userId = await getUserIdUseCase();
- 
+
       if (event.commentsIds.isEmpty) {
         emit(RepliesLoaded([]));
         return;

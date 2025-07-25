@@ -29,6 +29,7 @@ abstract class AuthenticationRemotDataSource {
     required String password,
     required String country,
     required String city,
+    required String gender,
     required List<String> preferredTopics,
   });
   Future<void> requestResetCode(String email);
@@ -57,7 +58,7 @@ class AuthenticationRemotDataSourceImpl
   @override
   Future<UserModel> login(String email, String password) async {
     Response resposne = await api.get(
-      EndPoints.logInEndPoint,
+      await EndPoints.logInEndPoint,
       queryParameters: {'email': email},
       header: {
         "password": password,
@@ -67,14 +68,14 @@ class AuthenticationRemotDataSourceImpl
     Map<dynamic, dynamic> resposneData = resposne.data;
     UserModel userData = UserModel.fromResponse(resposneData);
     final String? token = resposne.headers.value('authorization');
-    if (token == null || token.isEmpty|| userData == null) {
+    if (token == null || token.isEmpty || userData == null) {
       throw Exception("Authorization token not found in response headers");
     }
 
     // ✅ خزّن التوكن محليًا
     await local.saveTokenSec(token);
 
-    await local.saveData(userData.id!,"userID");
+    await local.saveData(userData.id!, "userID");
 
     return userData;
     // debugPrint("📤 الرابط النهائي: ${resposne.realUri}");
@@ -96,8 +97,9 @@ class AuthenticationRemotDataSourceImpl
       required String password,
       required String country,
       required String city,
+      required String gender,
       required List<String> preferredTopics}) async {
-    Response resposne = await api.post(EndPoints.registerEndPoint, data: {
+    Response resposne = await api.post(await EndPoints.registerEndPoint, data: {
       "userName": userName,
       "certifiedDoctor": certifiedDoctor,
       "firstName": firstName,
@@ -105,11 +107,13 @@ class AuthenticationRemotDataSourceImpl
       "birthDate": birthDate.toString(),
       "email": email,
       "location": {"country": country, "city": city},
-      "preferredTopics": preferredTopics
+      "preferredTopics": preferredTopics,
+      "gender": gender,
     }, header: {
       "password": password,
     });
     Map<String, dynamic> resposneData = resposne.data;
+    print("☮$resposneData");
     UserModel userData = UserModel.fromResponse(resposneData);
     final String? token = resposne.headers.value('authorization');
     if (token == null || token.isEmpty) {
@@ -126,7 +130,7 @@ class AuthenticationRemotDataSourceImpl
   @override
   Future<void> requestResetCode(String email) async {
     var res = await api.get(
-      EndPoints.RequestResetCodeEndPoint,
+      await EndPoints.requestResetCodeEndPoint,
       queryParameters: {"email": email},
     );
   }
@@ -135,7 +139,7 @@ class AuthenticationRemotDataSourceImpl
   Future<void> resetPassword(
       {required String token, required String newPassword}) async {
     await api.get(
-      EndPoints.RequestResetCodeEndPoint,
+      await EndPoints.requestResetCodeEndPoint,
       queryParameters: {"password": newPassword},
       header: {
         "token": token,
@@ -155,7 +159,7 @@ class AuthenticationRemotDataSourceImpl
     });
     await api.post(
       isFormData: false,
-      EndPoints.AddProfileImageEndPoint,
+      await EndPoints.addProfileImageEndPoint,
       data: formData,
       // header: {
       //   "token": token,
@@ -166,7 +170,7 @@ class AuthenticationRemotDataSourceImpl
   Future<void> ChosePreferredTopics({required String Topic}) async {
     final formData = FormData.fromMap({'preferredTopics': Topic});
     await api.patch(
-      EndPoints.ModifyProfileEndPoint,
+      await EndPoints.modifyProfileEndPoint,
       data: formData,
       // header: {
       //   "token": token,
@@ -178,7 +182,7 @@ class AuthenticationRemotDataSourceImpl
   Future<String> verifyResetCode(
       {required String email, required String code}) async {
     Response resposne = await api.get(
-      EndPoints.verifyResetCodeEndPoint,
+      await EndPoints.verifyResetCodeEndPoint,
       queryParameters: {"email": email},
       header: {
         "code": code,
@@ -191,6 +195,3 @@ class AuthenticationRemotDataSourceImpl
     return token;
   }
 }
-
-
-

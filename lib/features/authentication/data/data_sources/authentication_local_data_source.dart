@@ -13,12 +13,12 @@ import 'package:social_media_app/features/authentication/domain/entities/user_en
 abstract class AuthenticationLocalDataSource {
   Future<void> saveTokenSec(String token);
   Future<void> delTokenSec();
-  Future<String?> getTokenSec();
+  Future<String?> getTokenSec();    
   Future<void> saveData(String data, String key);
   Future<void> delData(String key);
   Future<String?> getData(String key);
   //saceuserdata()
-}
+} 
 
 /// AuthenticationDataSourceImpl is the concrete implementation of the AuthenticationDataSource
 /// interface.

@@ -3,17 +3,17 @@ import 'package:social_media_app/features/post/data/models/post_model/user.dart'
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
 
 class CommentModel {
-  final String id;
+  final String id;  
   final String content;
   final UserModel user;
   final List<String>? repliedBy;
   final String? repliedTo;
-  final List<String>? likedBy;
+  final List<String>? likedBy;  
   final DateTime createdAt;
 
   CommentModel({
     required this.id,
-    required this.content,
+    required this.content,    
     required this.user,
     required this.repliedBy,
     this.repliedTo,

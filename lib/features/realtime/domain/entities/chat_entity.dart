@@ -13,6 +13,18 @@ class ChatEntity extends Equatable {
     required this.messages,
   });
 
+  ChatEntity copyWith({
+    String? id,
+    List<String>? users,
+    List<MessageEntity>? messages,
+  }) {
+    return ChatEntity(
+      id: id ?? this.id,
+      users: users ?? this.users,
+      messages: messages ?? this.messages,
+    );
+  }
+
   @override
   List<Object> get props => [id, users, messages];
 }
@@ -29,6 +41,20 @@ class MessageEntity extends Equatable {
     required this.content,
     required this.createdAt,
   });
+
+  MessageEntity copyWith({
+    String? from,
+    String? to,
+    String? content,
+    DateTime? createdAt,
+  }) {
+    return MessageEntity(
+      from: from ?? this.from,
+      to: to ?? this.to,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 
   @override
   List<Object> get props => [from, to, content, createdAt];

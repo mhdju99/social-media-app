@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/utils/notifications_service.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_event.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_state.dart';
+import 'package:social_media_app/features/realtime/presentation/screens/allchatsPage.dart';
 import 'package:social_media_app/features/realtime/presentation/screens/chatPage.dart';
-import 'package:social_media_app/features/authentication/presentation/screens/UploadProfileImagePage.dart';
-import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
-import 'package:social_media_app/features/authentication/presentation/screens/topicSelectionPage.dart';
 import 'package:social_media_app/features/post/presentation/screens/homePage.dart';
 import 'package:social_media_app/features/post/presentation/screens/rellsPage.dart';
-import 'package:social_media_app/features/profile/presentation/screens/EditProfilePage.dart';
-import 'package:social_media_app/features/profile/presentation/screens/FollowersFollowingPage.dart';
-import 'package:social_media_app/features/profile/presentation/screens/edittopicPage.dart';
 import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
-import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,119 +19,105 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
+  Key _chatsKey = UniqueKey();
+  Key _profileKey = UniqueKey();
+  final List<Widget> _staticPages = [
     const Homepage(),
     const RellsPage(),
-
-    /// صفحة المحادثة مع OpenAI/ الصفحة الرئيسية للمنشورات
-    const ChatPage(targetUserId: "6856ba4d544a978c8d4cc199",),
-    // EditProfilePage()
-    ProfileScreen(),
-    // // صفحة الاستخدام
-    // ProfilePage(), // الصفحة الشخصية أو الإعدادات
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 2) {
+      _chatsKey = UniqueKey();
+    } else if (index == 3) {
+      _profileKey = UniqueKey();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final notificationBloc = context.read<NotificationBloc>();
+
+    // لا حاجة للاشتراك هنا إن كنت قد فعلت stream.listen داخل Bloc نفسه
+    // فقط إذا أردت logging إضافي مثلاً
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: SafeArea(
-        bottom: true,
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(24))),
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          child: BottomNavigationBar(
-            showSelectedLabels: false, // ⛔️ إخفاء العنوان المحدد
-            showUnselectedLabels: false, // ⛔️ إخفاء العنوان غير المحدد
-            selectedFontSize: 1,
-            type: BottomNavigationBarType.fixed,
-            selectedIconTheme: const IconThemeData(size: 30),
-            selectedItemColor: Colors.orange,
-            unselectedItemColor: Colors.grey.shade600,
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.home_outlined,
-                    size: 30,
-                  ),
-                  label: ""),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.explore,
-                    size: 30,
-                  ),
-                  label: ""),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.chat,
-                    size: 30,
-                  ),
-                  label: ""),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.person,
-                    size: 30,
-                  ),
-                  label: ""),
-            ],
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              _onItemTapped(index);
-            },
+    return BlocListener<NotificationBloc, NotificationState>(
+      listener: (context, state) {
+        if (state is NotificationUpdated) {
+          print(state.notifications[0]);
+
+          NotificationService.showNotification(
+            title: 'New Notification',
+            body: state.notifications[0]["text"],
+          );
+          context
+              .read<NotificationBloc>()
+              .add(AddNotificationEvent(state.notifications[0]));
+          // for (var notification in state.notifications) {
+          //   print(notification);
+          //               print(">💨");
+
+          //   NotificationService.showNotification(
+          //     title: 'New Notification',
+          //     body: notification["text"],
+          //   );
+          //   context
+          //       .read<NotificationBloc>()
+          //       .add(AddNotificationEvent(notification));
+          // }
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _staticPages[0],
+            _staticPages[1],
+            ChatsPage(
+              key: _chatsKey,
+            ),
+            ProfileScreen(
+              key: _profileKey,
+            ),
+          ],
+        ),
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(24)),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            child: BottomNavigationBar(
+              iconSize: 30,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              selectedFontSize: 1,
+              type: BottomNavigationBarType.fixed,
+              selectedIconTheme: const IconThemeData(size: 30),
+              selectedItemColor: Colors.orange,
+              unselectedItemColor: Colors.grey.shade600,
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+                BottomNavigationBarItem(icon: Icon(Icons.explore), label: ""),
+                BottomNavigationBarItem(icon: Icon(Icons.chat), label: ""),
+                BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+              ],
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-// BottomNavigationBar(
-//         selectedFontSize: 14,
-//         type: BottomNavigationBarType.shifting,
-//         selectedIconTheme: const IconThemeData(size: 19),
-//         showUnselectedLabels: true,
-//         selectedItemColor: Colors.orange,
-//         unselectedItemColor: Colors.grey.shade600,
-//         items: const [
-//           BottomNavigationBarItem(
-//               icon: Icon(
-//                 Icons.home_outlined,
-//                 size: 30,
-//               ),
-//               label: "Home"),
-//           BottomNavigationBarItem(
-//               icon: Icon(
-//                 Icons.explore,
-//                 size: 30,
-//               ),
-//               label: "Discover"),
-//           BottomNavigationBarItem(
-//               icon: Icon(
-//                 Icons.chat,
-//                 size: 30,
-//               ),
-//               label: "Chat"),
-//           BottomNavigationBarItem(
-//               icon: Icon(
-//                 Icons.person,
-//                 size: 30,
-//               ),
-//               label: "Profile"),
-//         ],
-//         currentIndex: _selectedIndex,
-//         onTap: (index) {
-//           _onItemTapped(index);
-//         },
-//       )

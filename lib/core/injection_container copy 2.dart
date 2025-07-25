@@ -37,7 +37,9 @@ Future<void> init3() async {
   sl.registerLazySingleton(() => ChangePasswordUsecase( sl()));
   sl.registerLazySingleton(() => FollowUnfollowUsecase( sl()));
   sl.registerLazySingleton(() => GetProfilePhotoAndNameUsecase( sl()));
-  sl.registerLazySingleton(() => GetUserProfileUsecase( sl()));
+  if (!sl.isRegistered<GetUserProfileUsecase>()) {
+    sl.registerLazySingleton(() => GetUserProfileUsecase(sl()));
+  }
   sl.registerLazySingleton(() => ModifyProfileUsecase( sl()));
 
 

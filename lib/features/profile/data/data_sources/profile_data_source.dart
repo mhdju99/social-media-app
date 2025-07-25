@@ -53,25 +53,27 @@ class ProfileDataSourceImpl implements ProfileDataSource {
   @override
   Future<void> blockUnblock({required String userId}) async {
     await api
-        .put(EndPoints.blockunblockEndPoint, data: {"targetUserId": userId});
+        .put(await EndPoints.blockUnblockEndPoint, data: {"targetUserId": userId});
   }
 
   @override
   Future<void> changepassword(
       {required String oldPassword, required String newPassword}) async {
-    await api.put(EndPoints.changepasswordEndPoint,
+    await api.put(await
+      EndPoints.
+      changePasswordEndPoint,
         data: {"oldPassword": oldPassword, "newPassword": newPassword});
   }
 
   @override
   Future<void> followUnfollowUser({required String userId}) async {
     await api
-        .put(EndPoints.followunfollowEndPoint, data: {"targetUserId": userId});
+        .put(await EndPoints.followUnfollowEndPoint, data: {"targetUserId": userId});
   }
 
   @override
   Future<UserProfileModel> getUserProfile({required String userId}) async {
-    Response response = await api.get(EndPoints.getusersprofileEndPoint,
+    Response response = await api.get(await EndPoints.getUsersProfileEndPoint,
         queryParameters: {"userId": userId});
     UserProfileModel userProfileModel =
         UserProfileModel.fromResponse(response.data);
@@ -81,7 +83,7 @@ class ProfileDataSourceImpl implements ProfileDataSource {
   @override
   Future<List<UserModel>> getprofilePhotoAndName(
       {required List<String> userId}) async {
-    Response response = await api.get(EndPoints.getnameimageEndPoint,
+    Response response = await api.get(await EndPoints.getNameImageEndPoint,
         queryParameters: {"usersIds": userId.join('-')});
 
     List<UserModel> userModel = [];
@@ -120,8 +122,8 @@ final Map<String, dynamic> data = {};
 
         final formData = FormData.fromMap(data);
 
-    await api.patch(
-      EndPoints.ModifyProfileEndPoint,data: formData
+    await api.patch(await
+      EndPoints.modifyProfileEndPoint,data: formData
     );
   }
 }

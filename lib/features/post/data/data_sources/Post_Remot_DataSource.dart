@@ -71,7 +71,7 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
 
     if (repliedTo != null) data['repliedTo'] = repliedTo;
 
-    await api.post(EndPoints.addcommentEndPoint, data: data);
+    await api.post(await EndPoints.addCommentEndPoint, data: data);
   }
 
   @override
@@ -96,21 +96,21 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
         ),
       );
     }
-    await api.post(
-      EndPoints.createpostEndPoint,
+    await api.post(await
+      EndPoints.createPostEndPoint,
       data: formData,
     );
   }
 
   @override
   Future<void> deletePost({required String postId}) async {
-    await api.delete(EndPoints.deletepostEndPoint,
+    await api.delete(await EndPoints.deletePostEndPoint,
         queryParameters: {"postId": postId});
   }
 
   @override
   Future<void> likeUnlikePost({required String postId}) async {
-    await api.put(EndPoints.likeUnlikepostEndPoint, data: {"postId": postId});
+    await api.put(await EndPoints.likeUnlikePostEndPoint, data: {"postId": postId});
   }
 
   @override
@@ -139,7 +139,7 @@ final formData = FormData.fromMap({
         );
       }
     }
-    await api.patch(EndPoints.updatepostEndPoint, data: formData, header: {
+    await api.patch(await EndPoints.updatePostEndPoint, data: formData, header: {
       "post-id": postId.toString(),
     });
   }
@@ -147,7 +147,7 @@ final formData = FormData.fromMap({
   @override
   Future<PostDetailsModel> getPostDetails({required String postId}) async {
     Response response = await api
-        .get(EndPoints.getpostEndPoint, queryParameters: {"postId": postId});
+        .get(await EndPoints.getPostEndPoint, queryParameters: {"postId": postId});
 
     Map<String, dynamic> resposneData = response.data;
     PostDetailsModel postModel = PostDetailsModel.fromResponse(resposneData);
@@ -160,7 +160,7 @@ final formData = FormData.fromMap({
   Future<void> likeUnlikeComment({required String commentId}) async {
     debugPrint("❤");
     debugPrint(commentId);
-    await api.put(
+    await api.put(await
       EndPoints.likeCommentEndPoint,
       data: {"commentId": commentId},
     );
@@ -169,6 +169,7 @@ final formData = FormData.fromMap({
   @override
   Future<void> deleteComment({required String commentId}) async {
     final x = await api.delete(
+      await
       EndPoints.deleteCommentEndPoint,
       queryParameters: {"commentId": commentId},
     );
@@ -179,6 +180,7 @@ final formData = FormData.fromMap({
   Future<List<CommentModel>> getReplies(
       {required List<String> commentIds}) async {
     final response = await api.get(
+      await
       EndPoints.getRepliesEndPoint,
       queryParameters: {"commentsIds": commentIds.join(',')},
     );
@@ -190,11 +192,14 @@ final formData = FormData.fromMap({
   @override
   Future<List<PostModel>> getPosts({required bool isRells}) async {
     final response = await api.post(
-      EndPoints.getpostsEndPoint,
+      await
+      EndPoints.getPostsEndPoint,
       data: {"reelFlag":isRells},
     );
+          print("🕳$response");
 
-    final data = response.data['posts'] as List;
+
+    final data = response.data as List;
     return data.map((json) => PostModel.fromJson(json)).toList();
   }
 }

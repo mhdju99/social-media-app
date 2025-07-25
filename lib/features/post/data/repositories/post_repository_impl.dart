@@ -14,12 +14,15 @@ class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl(this.postRemotDataSource);
 
   @override
-  Future<Either<Failure, void>> addComment(
-      {required String postId, required String content,
+  Future<Either<Failure, void>> addComment({
+    required String postId,
+    required String content,
     String? repliedTo,
   }) async {
     try {
-      await postRemotDataSource.addComment(postId: postId, content: content,
+      await postRemotDataSource.addComment(
+        postId: postId,
+        content: content,
         repliedTo: repliedTo,
       );
       // await local.saveToken(user.)
@@ -30,7 +33,8 @@ class PostRepositoryImpl implements PostRepository {
       return left(Failure(errMessage: a.toString()));
     }
   }
-@override
+
+  @override
   Future<Either<Failure, void>> likeUnlikeComment(
       {required String commentId}) async {
     try {
@@ -42,6 +46,7 @@ class PostRepositoryImpl implements PostRepository {
       return left(Failure(errMessage: a.toString()));
     }
   }
+
   @override
   Future<Either<Failure, void>> deleteComment(
       {required String commentId}) async {
@@ -55,7 +60,7 @@ class PostRepositoryImpl implements PostRepository {
     }
   }
 
-@override
+  @override
   Future<Either<Failure, List<Comment>>> getReplies(
       {required List<String> commentIds}) async {
     try {
@@ -124,9 +129,10 @@ class PostRepositoryImpl implements PostRepository {
   }) async {
     try {
       await postRemotDataSource.modifyPost(
-        postId: postId,
-           describtion: describtion, images: images,
-           deleteImagesIds: deleteImagesIds);
+          postId: postId,
+          describtion: describtion,
+          images: images,
+          deleteImagesIds: deleteImagesIds);
       // await local.saveToken(user.)
       return right(null);
     } on ServerException catch (e) {
@@ -137,9 +143,11 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, PostDetails>> getPostDetails({required String postId}) async {
+  Future<Either<Failure, PostDetails>> getPostDetails(
+      {required String postId}) async {
     try {
-    final postModel =  await postRemotDataSource.getPostDetails(postId: postId);
+      final postModel =
+          await postRemotDataSource.getPostDetails(postId: postId);
       return right(postModel.toEntity());
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
@@ -147,12 +155,11 @@ class PostRepositoryImpl implements PostRepository {
       return left(Failure(errMessage: a.toString()));
     }
   }
-  
+
   @override
   Future<Either<Failure, List<Post>>> getPosts({required bool isRells}) async {
     try {
-      final PostModels =
-          await postRemotDataSource.getPosts(isRells: isRells);
+      final PostModels = await postRemotDataSource.getPosts(isRells: isRells);
       final posts = PostModels.map((model) => model.toEntity()).toList();
       return right(posts);
     } on ServerException catch (e) {

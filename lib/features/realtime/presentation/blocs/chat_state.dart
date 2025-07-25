@@ -28,8 +28,36 @@ class ChatLoaded extends ChatState {
   @override
   List<Object> get props => [chat];
 }
+class ChatListLoaded extends ChatState {
+  final List<ChatEntity> chats;
+  ChatListLoaded(this.chats);
+  ChatListLoaded copyWith({List<ChatEntity>? chats}) {
+    return ChatListLoaded(chats ?? this.chats);
+  }
+
+  @override
+  List<Object> get props => [chats];
+}
+class UserBecameOnlineState extends ChatState {
+  final String userId;
+
+  UserBecameOnlineState(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
+
+class UserBecameOfflineState extends ChatState {
+  final String userId;
+  final String lastSeenAt; // أو DateTime حسب التنسيق الذي يصلك من السيرفر
+
+  UserBecameOfflineState(this.userId, this.lastSeenAt);
+
+  @override
+  List<Object> get props => [userId, lastSeenAt];
+}
 class UserOnlineStatusLoaded extends ChatState {
-  final bool isOnline;
+  final  Map<String, dynamic>  isOnline;
   UserOnlineStatusLoaded(this.isOnline);
 
   @override

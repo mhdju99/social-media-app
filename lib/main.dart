@@ -1,24 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/databases/cache/cache_helper.dart';
-import 'package:social_media_app/core/injection_container%203.dart';
+import 'package:social_media_app/core/injection_container%203.dart' as ch;
+import 'package:social_media_app/core/injection_container%204.dart' as nt;
 import 'package:social_media_app/core/injection_container%20copy%202.dart';
 import 'package:social_media_app/core/injection_container%20copy.dart';
 import 'package:social_media_app/core/injection_container.dart';
+import 'package:social_media_app/core/injection_container.dart' as NotificationService;
+import 'package:social_media_app/core/utils/logger.dart';
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/BlocObserver.dart';
+import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/splashScreen.dart';
+import 'package:social_media_app/features/realtime/data/models/notification_model.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_bloc.dart';
+import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //  await Logger.clear();
+    
+    //  Logger.testReadLogs(); // إضافة هنا
+
+  await Logger.log("App started");
   // Bloc.observer = SimpleBlocObserver();
+  
   await init();
   await init2();
   await init3();
-  await init4();
-  await CacheHelper.init(); 
+  await ch.init4();
+  await nt.init5();
+  await CacheHelper.init();
+    await EndPoints.init();
 
-  runApp(const MyApp());
+  await NotificationService.init();
+   await Hive.initFlutter();
+  Hive.registerAdapter(NotificationModelAdapter());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+          
+        BlocProvider<ChatBloc>(
+          create: (_) => ch.sl<ChatBloc>(),
+        ),
+         BlocProvider<TrackerBloc>(
+            lazy: false, // هذا يُجبره على الإنشاء حتى لو لم يُستخدم
+
+  create: (_) {
+    
+    final bloc = ch.sl<TrackerBloc>();
+    Future.microtask(() => bloc.add(ResetSessionEvent())); // هنا الفرق
+    return bloc;
+  },
+),
+          BlocProvider<AuthenticationBloc>(
+          create: (_) => ch.sl<AuthenticationBloc>(),
+        ),
+         BlocProvider(
+          create: (_) => nt.sl<NotificationBloc>(),
+        ),
+        // BlocProvider<AnotherBloc>(create: (_) => sl<AnotherBloc>()..add(...))
+        // أضف هنا أي Bloc آخر تستخدمه
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -32,7 +83,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
      
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const SplashScreen(),

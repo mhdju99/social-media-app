@@ -15,6 +15,7 @@ class testpage extends StatefulWidget {
 class _testpageState extends State<testpage> {
   @override
   String? _token;
+  String? _id;
 
   @override
   void initState() {
@@ -25,10 +26,12 @@ class _testpageState extends State<testpage> {
   Future<void> _loadToken() async {
     final localDataSource = sl<AuthenticationLocalDataSource>();
     final token = await localDataSource.getTokenSec();
+    final id = await localDataSource.getData("userID");
 
     if (mounted) {
       setState(() {
         _token = token;
+        _id = id;
       });
     }
 
@@ -55,20 +58,27 @@ class _testpageState extends State<testpage> {
         builder: (context, state) {
           return SafeArea(
             top: true,
-            child: Column(
-              children: [
-                Center(
-                  child: _token == null
-                      ? const Text("لم يتم العثور على توكن")
-                      : Text("Token: $_token"),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    context.read<AuthenticationBloc>().add(LogOutRequested());
-                  },
-                  child: const Text("Logout"),
-                )
-              ],
+            child: Center(
+              child: Column(
+                children: [
+                  Center(
+                    child: _token == null
+                        ? const Text("لم يتم العثور على توكن")
+                        : Column(
+                          children: [
+                            Text("Token: $_token"),
+                            Text("id: $_id"),
+                          ],
+                        ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      context.read<AuthenticationBloc>().add(LogOutRequested());
+                    },
+                    child: const Text("Logout"),
+                  )
+                ],
+              ),
             ),
           );
         },

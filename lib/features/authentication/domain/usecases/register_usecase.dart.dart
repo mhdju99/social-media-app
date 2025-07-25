@@ -11,6 +11,7 @@ class RegisterUseCase {
 
   Future<Either<Failure, UserEntity>> call(RegisterParams params) {
     return repository.register(
+      gender: params.gender,
       userName: params.userName,
       certifiedDoctor: params.certifiedDoctor,
       firstName: params.firstName,

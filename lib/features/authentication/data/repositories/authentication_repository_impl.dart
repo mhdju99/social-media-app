@@ -22,7 +22,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final AuthenticationRemotDataSource remot;
   final AuthenticationLocalDataSource local;
   AuthenticationRepositoryImpl({
-    required this.remot,
+    required this.remot,    
     required this.local,
   });
 
@@ -67,9 +67,12 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       required String password,
       required String country,
       required String city,
+      required String gender,
+
       required List<String> preferredTopics}) async {
     try {
       final userModel = await remot.register(
+        gender: gender,
         userName: userName,
         certifiedDoctor: certifiedDoctor,
         firstName: firstName,
@@ -141,7 +144,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return left(Failure(errMessage: "somthing wrong"));
     }
   }
-
+  
   @override
   Future<Either<Failure, void>> ChosePreferredTopics(
       {required String topic}) async {

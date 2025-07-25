@@ -12,6 +12,9 @@ import 'package:social_media_app/features/authentication/presentation/screens/co
 import 'package:social_media_app/features/authentication/presentation/screens/signUpPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/widgets/buttonText.dart';
+import 'package:social_media_app/features/profile/presentation/screens/ipchange.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_event.dart';
 import 'package:social_media_app/main_page.dart';
 
 class LogIn extends StatefulWidget {
@@ -37,6 +40,7 @@ class _LogInState extends State<LogIn> {
                 // context
                 //   .read<ChatBloc>()
                 //   .add(ConnectToSocketEvent(response.token));
+                context.read<ChatBloc>().add(ConnectToSocketEvent());
 
               Navigator.pushReplacement(
                 contexts,
@@ -200,6 +204,25 @@ class _LogInState extends State<LogIn> {
                             },
                             child: const Text(
                               "Sign Up Now",
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.purple,
+                                fontFamily: "Metropolis",
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SetIpPage()),
+                              );
+                            },
+                            child: const Text(
+                              "change server ip ",
                               textAlign: TextAlign.end,
                               style: TextStyle(
                                 fontSize: 14,

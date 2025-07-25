@@ -181,146 +181,149 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 );
               }
             },
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Profile Image
-                  Center(
-                    child: Stack(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: selectedImage != null
-                                  ? FileImage(selectedImage!)
-                                  : NetworkImage(
-                                      "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.user.profileImage}",
-                                    ) as ImageProvider,
-                              fit: BoxFit.cover,
+            child: SafeArea(
+              bottom: true,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Profile Image
+                    Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: selectedImage != null
+                                    ? FileImage(selectedImage!)
+                                    : NetworkImage(
+                                        "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.user.profileImage}",
+                                      ) as ImageProvider,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () => _pickImage(context),
-                            child: const CircleAvatar(
-                              radius: 16,
-                              backgroundColor: Colors.blue,
-                              child: Icon(Icons.camera_alt,
-                                  size: 16, color: Colors.white),
+                          Positioned(
+                            bottom: 0,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => _pickImage(context),
+                              child: const CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Colors.blue,
+                                child: Icon(Icons.camera_alt,
+                                    size: 16, color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Editable Fields
-                  buildEditableField(
-                    label: "first Name",
-                    controller: firstNameController,
-                    isEditing: isEditingfirstName,
-                    onEdit: () => setState(() => isEditingfirstName = true),
-                  ),
-                  buildEditableField(
-                    label: "last Name",
-                    controller: lastNameController,
-                    isEditing: isEditinglastName,
-                    onEdit: () => setState(() => isEditinglastName = true),
-                  ),
-                  buildEditableDateField(
-                    label: "date",
-                    controller: dateController,
-                    isEditing: isEditingDate,
-                    onEdit: () => setState(() => isEditingDate = true),
-                  ),
-                  buildEditableField(
-                    label: "Username",
-                    controller: usernameController,
-                    isEditing: isEditingUsername,
-                    onEdit: () => setState(() => isEditingUsername = true),
-                  ),
-                  buildEditableField(
-                    label: "Email",
-                    controller: emailController,
-                    isEditing: isEditingEmail,
-                    onEdit: () => setState(() => isEditingEmail = true),
-                  ),
-                  buildEditableField(
-                    label: "country",
-                    controller: countryController,
-                    isEditing: isEditingcountry,
-                    onEdit: () => setState(() => isEditingcountry = true),
-                  ),
-                  buildEditableField(
-                    label: "city",
-                    controller: cityController,
-                    isEditing: isEditingcity,
-                    onEdit: () => setState(() => isEditingcity = true),
-                  ),
-                  buildEditableField(
-                    label: "Bio",
-                    controller: bioController,
-                    isEditing: isEditingBio,
-                    onEdit: () => setState(() => isEditingBio = true),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Save Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: BlocBuilder<ProfileBloc, ProfileState>(
-                      builder: (context, state) {
-                        return ElevatedButton(
-                          onPressed: () {
-                            context.read<ProfileBloc>().add(ModifyProfileEvent(
-                                email: isEditingEmail
-                                    ? emailController.text
-                                    : null,
-                                lastName: isEditinglastName
-                                    ? lastNameController.text
-                                    : null,
-                                firstName: isEditingfirstName
-                                    ? firstNameController.text
-                                    : null,
-                                about: isEditingBio ? bioController.text : null,
-                                birthDate: (isEditingDate &&
-                                        dateController.text.isNotEmpty)
-                                    ? dateController.text
-                                    : null,
-                                city:
-                                    isEditingcity ? cityController.text : null,
-                                country: isEditingcountry
-                                    ? countryController.text
-                                    : null,
-                                userName: isEditingUsername
-                                    ? usernameController.text
-                                    : null,
-                                photo: selectedImage));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: const Text("Save Changes",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16)),
-                        );
-                      },
+              
+                    const SizedBox(height: 30),
+              
+                    // Editable Fields
+                    buildEditableField(
+                      label: "first Name",
+                      controller: firstNameController,
+                      isEditing: isEditingfirstName,
+                      onEdit: () => setState(() => isEditingfirstName = true),
                     ),
-                  ),
-                ],
+                    buildEditableField(
+                      label: "last Name",
+                      controller: lastNameController,
+                      isEditing: isEditinglastName,
+                      onEdit: () => setState(() => isEditinglastName = true),
+                    ),
+                    buildEditableDateField(
+                      label: "date",
+                      controller: dateController,
+                      isEditing: isEditingDate,
+                      onEdit: () => setState(() => isEditingDate = true),
+                    ),
+                    buildEditableField(
+                      label: "Username",
+                      controller: usernameController,
+                      isEditing: isEditingUsername,
+                      onEdit: () => setState(() => isEditingUsername = true),
+                    ),
+                    buildEditableField(
+                      label: "Email",
+                      controller: emailController,
+                      isEditing: isEditingEmail,
+                      onEdit: () => setState(() => isEditingEmail = true),
+                    ),
+                    buildEditableField(
+                      label: "country",
+                      controller: countryController,
+                      isEditing: isEditingcountry,
+                      onEdit: () => setState(() => isEditingcountry = true),
+                    ),
+                    buildEditableField(
+                      label: "city",
+                      controller: cityController,
+                      isEditing: isEditingcity,
+                      onEdit: () => setState(() => isEditingcity = true),
+                    ),
+                    buildEditableField(
+                      label: "Bio",
+                      controller: bioController,
+                      isEditing: isEditingBio,
+                      onEdit: () => setState(() => isEditingBio = true),
+                    ),
+              
+                    const SizedBox(height: 30),
+              
+                    // Save Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: BlocBuilder<ProfileBloc, ProfileState>(
+                        builder: (context, state) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              context.read<ProfileBloc>().add(ModifyProfileEvent(
+                                  email: isEditingEmail
+                                      ? emailController.text
+                                      : null,
+                                  lastName: isEditinglastName
+                                      ? lastNameController.text
+                                      : null,
+                                  firstName: isEditingfirstName
+                                      ? firstNameController.text
+                                      : null,
+                                  about: isEditingBio ? bioController.text : null,
+                                  birthDate: (isEditingDate &&
+                                          dateController.text.isNotEmpty)
+                                      ? dateController.text
+                                      : null,
+                                  city:
+                                      isEditingcity ? cityController.text : null,
+                                  country: isEditingcountry
+                                      ? countryController.text
+                                      : null,
+                                  userName: isEditingUsername
+                                      ? usernameController.text
+                                      : null,
+                                  photo: selectedImage));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text("Save Changes",
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 16)),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

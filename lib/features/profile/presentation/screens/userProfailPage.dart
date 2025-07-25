@@ -38,9 +38,17 @@ class UserProfileScreen extends StatelessWidget {
               ),
               backgroundColor: Colors.white,
               elevation: 1,
-              actions: const [
+              actions:  [
                 Icon(Icons.menu, color: Colors.black),
                 SizedBox(width: 16),
+                InkWell(
+                    onTap: () {
+                      context
+                          .read<ProfileBloc>()
+                          .add(GetUserProfileEvent(userId));
+                    },
+                    child: Icon(Icons.refresh, color: Colors.black)),                SizedBox(width: 16),
+
               ],
             ),
             backgroundColor: Colors.grey[100],
@@ -128,6 +136,8 @@ class UserProfileScreen extends StatelessWidget {
                   label: 'Followers',
                   ontap: () {
                     if (user.followers.isNotEmpty) {
+                         print("uu💘");
+                      print(user.following);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -142,6 +152,8 @@ class UserProfileScreen extends StatelessWidget {
                   count: user.following.length.toString(),
                   label: 'Following',
                   ontap: () {
+                       print("uu💘");
+                    print(user.following);
                     if (user.following.isNotEmpty) {
                       Navigator.push(
                         context,
@@ -178,9 +190,9 @@ class UserProfileScreen extends StatelessWidget {
                   onPressed: () {
                     // تنفيذ عملية المتابعة (تابع من خلال bloc أو API حسب نظامك)
                     // مثال:
-                    // context.read<ProfileBloc>().add(FollowUserEvent(user.id));
+                    context.read<ProfileBloc>().add(FollowUnfollowUserEvent(userId));
                   },
-                  child: const Text('Follow'),
+                  child: user.isfollow? Text('unFollow'): Text('Follow'),
                 ),
               ),
               const SizedBox(width: 8),
@@ -189,11 +201,7 @@ class UserProfileScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => BlocProvider(
-                        create: (context) =>
-                            sl<ChatBloc>()..add(GetChatEvent(userId)),
-                        child: ChatPage(targetUserId: userId),
-                      ),
+                      builder: (_) => ChatPage(targetUserId: userId,user: user,),
                     ),
                   );
                 },

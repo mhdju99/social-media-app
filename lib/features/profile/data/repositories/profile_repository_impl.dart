@@ -69,16 +69,23 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<Either<Failure, List<User>>> getprofilePhotoAndName(
       {required List<String> userId}) async {
     try {
-      final List<UserModel>  usersModel =
+      print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      final List<UserModel> usersModel =
           await profileDataSource.getprofilePhotoAndName(userId: userId);
+      print(usersModel.toString());
+
       List<User> users = [];
-   users=  (usersModel as List)
-          .map<User>((user) => user.toEntity())
-          .toList();
+      users =
+          (usersModel as List).map<User>((user) => user.toEntity()).toList();
       return right(users);
     } on ServerException catch (e) {
+      print("💫");
+      print(e.errorModel.errorMessage);
+
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
+            print("💫");
+      print(a.toString());
       return left(Failure(errMessage: a.toString()));
     }
   }

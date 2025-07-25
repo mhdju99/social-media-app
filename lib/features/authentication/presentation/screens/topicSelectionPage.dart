@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/injection_container.dart';
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
+import 'package:social_media_app/features/post/presentation/screens/homePage.dart';
+import 'package:social_media_app/main_page.dart';
 // import '../bloc/genre_bloc.dart';
 
 class topicSelectionPage extends StatefulWidget {
@@ -46,7 +48,7 @@ class _topicSelectionPageState extends State<topicSelectionPage> {
               if (state is ChosePreferredTopicsSuccess) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const testpage()),
+                  MaterialPageRoute(builder: (context) => const MainPage()),
                 );
               } else if (state is AuthFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(

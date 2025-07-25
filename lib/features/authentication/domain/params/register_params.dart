@@ -11,6 +11,7 @@ class RegisterParams {
   final String password;
   final String country;
   final String city;
+  final String gender;
   final List<String> preferredTopics;
   RegisterParams({
     required this.certifiedDoctor,
@@ -22,6 +23,7 @@ class RegisterParams {
     required this.password,
     required this.country,
     required this.city,
+    required this.gender,
     required this.preferredTopics,
   });
 }

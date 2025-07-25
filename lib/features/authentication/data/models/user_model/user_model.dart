@@ -11,9 +11,9 @@ class UserModel {
   List<dynamic>? following;
   bool? certifiedDoctor;
   String? firstName;
-  List<dynamic>? posts;
+  List<dynamic>? posts  ;
   String? lastName;
-  DateTime? birthDate;
+  DateTime? birthDate;  
   String? email;
   List<dynamic>? preferredTopics;
   List<dynamic>? files;
@@ -49,7 +49,7 @@ class UserModel {
         location: json['location'] == null
             ? null
             : lo.Location.fromJson(json['location'] as Map<String, dynamic>),
-        id: json['_id'] as String? ??"0",
+        id: json['id'] as String? ??"0",
         userName: json['userName'] as String?,
         followers: json['followers'] as List<dynamic>?,
         following: json['following'] as List<dynamic>?,

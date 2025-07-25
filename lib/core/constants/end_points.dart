@@ -1,32 +1,43 @@
+import 'package:social_media_app/core/databases/sh_helper.dart';
+
 class EndPoints {
-  static const String baseUrl = 'http://192.168.1.3:3000/api';
-  static const String socetUrl = 'http://192.168.1.3:3000';
-  static const String logInEndPoint = '$baseUrl/users/login';
-  static const String registerEndPoint = '$baseUrl/users/create-account';
-  static const String RequestResetCodeEndPoint = '$baseUrl/users/request-code';
-  static const String verifyResetCodeEndPoint = '$baseUrl/users/verify-code';
-  static const String resetPasswordCodeEndPoint =
-      '$baseUrl/user/reset-password';
-  static const String AddProfileImageEndPoint = '$baseUrl/users/profile-image';
+  static const String _defaultIp = '192.168.250.132';
+  static late String _baseIp;
+  static late String baseUrl;
+  static late String socketUrl;
 
-  static const String ModifyProfileEndPoint = '$baseUrl/users/modify-profile';
-  static const String changepasswordEndPoint = '$baseUrl/users/change-password';
-  static const String blockunblockEndPoint = '$baseUrl/users/block-unblock';
-  static const String followunfollowEndPoint = '$baseUrl/users/follow-unfollow';
-  static const String getusersprofileEndPoint =
+  static Future<void> init() async {
+    _baseIp = await SharedPrefsHelper.getServerIp() ?? _defaultIp;
+    baseUrl = 'http://$_baseIp:3000/api';
+    socketUrl = 'http://$_baseIp:3000';
+  }
+
+  static String get logInEndPoint => '$baseUrl/users/login';
+  static String get registerEndPoint => '$baseUrl/users/create-account';
+  static String get requestResetCodeEndPoint => '$baseUrl/users/request-code';
+  static String get verifyResetCodeEndPoint => '$baseUrl/users/verify-code';
+  static String get resetPasswordCodeEndPoint => '$baseUrl/user/reset-password';
+  static String get addProfileImageEndPoint => '$baseUrl/users/profile-image';
+  static String get modifyProfileEndPoint => '$baseUrl/users/modify-profile';
+  static String get getAllChatsEndPoint => '$baseUrl/chats/getAllChats';
+  static String get changePasswordEndPoint => '$baseUrl/users/change-password';
+  static String get blockUnblockEndPoint => '$baseUrl/users/block-unblock';
+  static String get followUnfollowEndPoint => '$baseUrl/users/follow-unfollow';
+  static String get getUsersProfileEndPoint =>
       '$baseUrl/users/get-users-profile';
-  static const String getnameimageEndPoint = '$baseUrl/users/get-name-image';
+  static String get getNameImageEndPoint => '$baseUrl/users/get-name-image';
 
-  static const String likeCommentEndPoint = "$baseUrl/comments/like-comment";
-  static const String deleteCommentEndPoint =
-      "$baseUrl/comments/delete-comment";
-  static const String getRepliesEndPoint = "$baseUrl/comments/get-replies";
-  static const String getpostEndPoint = '$baseUrl/posts/get-post';
-  static const String getpostsEndPoint = '$baseUrl/posts/get-posts';
-  static const String createpostEndPoint = '$baseUrl/posts/create-post';
-  static const String deletepostEndPoint = '$baseUrl/posts/delete-post';
-  static const String likeUnlikepostEndPoint =
-      '$baseUrl/posts/like-unlike-post';
-  static const String updatepostEndPoint = '$baseUrl/posts/modify-post';
-  static const String addcommentEndPoint = '$baseUrl/comments/create-comment';
+  static String get likeCommentEndPoint => '$baseUrl/comments/like-comment';
+  static String get deleteCommentEndPoint => '$baseUrl/comments/delete-comment';
+  static String get getRepliesEndPoint => '$baseUrl/comments/get-replies';
+
+  static String get getPostEndPoint => '$baseUrl/posts/get-post';
+  static String get getPostsEndPoint => '$baseUrl/posts/get-posts';
+  static String get createPostEndPoint => '$baseUrl/posts/create-post';
+  static String get deletePostEndPoint => '$baseUrl/posts/delete-post';
+  static String get likeUnlikePostEndPoint => '$baseUrl/posts/like-unlike-post';
+  static String get updatePostEndPoint => '$baseUrl/posts/modify-post';
+  static String get addCommentEndPoint => '$baseUrl/comments/create-comment';
+  static String get recommendEndPoint => 'http://$_baseIp:5000/api/ai/recommend';
+  static String get feedbackEndPoint => 'http://$_baseIp:5000/api/ai/feedback';
 }

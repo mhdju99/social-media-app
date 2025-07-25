@@ -5,6 +5,7 @@ import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/features/post/domian/entities/user_entity.dart';
 
 import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 
 import '../../../../core/injection_container copy 2.dart';
 
@@ -19,7 +20,6 @@ class FollowersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocProvider(
       create: (context) =>
           sl<ProfileBloc>()..add(GetProfilePhotoAndNameEvent(data)),
@@ -55,62 +55,68 @@ class FollowersPage extends StatelessWidget {
                   ),
                   itemBuilder: (context, index) {
                     final user = state.data[index];
-                    return Card(
-                      elevation: 2,
-                      child: ListTile(
-                        leading: GestureDetector(
-                          onTap: () {
-                            // فتح صفحة البروفايل الخاص بالمستخدم
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (_) => UserProfilePage(userName: user["name"]),
-                            //     ));
-                          },
-                          child: CircleAvatar(
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UserProfileScreen(
+                                userId: user.id,
+                              ),
+                            ));
+                      },
+                      child: Card(
+                        elevation: 2,
+                        child: ListTile(
+                          leading: CircleAvatar(
                             radius: 24,
-                            backgroundImage: (user.profileImage != null && user.profileImage!.isNotEmpty)?NetworkImage(
-              "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${user.profileImage}",
-            ): AssetImage("assets/images/default_avatar.png"),
+                            backgroundImage: (user.profileImage.isNotEmpty)
+                                ? NetworkImage(
+                                    "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${user.profileImage}",
+                                  )
+                                : const AssetImage(
+                                    "assets/images/default_avatar.png"),
                           ),
-                        ),
-                        title: GestureDetector(
-                          onTap: () {
-                            // نفس الشيء: فتح البروفايل
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (_) => UserProfilePage(userName: user["name"]),
-                            //     ));
-                          },
-                          child: Text(
-                            user.userName,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 16),
+                          title: GestureDetector(
+                            onTap: () {
+                              // نفس الشيء: فتح البروفايل
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //       builder: (_) => UserProfilePage(userName: user["name"]),
+                              //     ));
+                            },
+                            child: Text(
+                              user.userName,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 16),
+                            ),
                           ),
+                          // trailing: ElevatedButton(
+                          //   style: ElevatedButton.styleFrom(
+                          //     backgroundColor: user["isFollowing"]
+                          //         ? Colors.grey[200]
+                          //         : Colors.blue,
+                          //     foregroundColor: user["isFollowing"]
+                          //         ? Colors.black
+                          //         : Colors.white,
+                          //     padding: const EdgeInsets.symmetric(horizontal: 12),
+                          //     minimumSize: const Size(10, 36),
+                          //   ),
+                          //   onPressed: () {
+                          //     // تغيير حالة المتابعة
+                          //   },
+                          //   child: Text(user["isFollowing"] ? "متابع" : "متابعة"),
+                          // ),
                         ),
-                        // trailing: ElevatedButton(
-                        //   style: ElevatedButton.styleFrom(
-                        //     backgroundColor: user["isFollowing"]
-                        //         ? Colors.grey[200]
-                        //         : Colors.blue,
-                        //     foregroundColor: user["isFollowing"]
-                        //         ? Colors.black
-                        //         : Colors.white,
-                        //     padding: const EdgeInsets.symmetric(horizontal: 12),
-                        //     minimumSize: const Size(10, 36),
-                        //   ),
-                        //   onPressed: () {
-                        //     // تغيير حالة المتابعة
-                        //   },
-                        //   child: Text(user["isFollowing"] ? "متابع" : "متابعة"),
-                        // ),
                       ),
                     );
                   },
                 );
               } else {
-                return SizedBox();
+                return const SizedBox(
+                  child: Text("sdsd"),
+                );
               }
             },
           ),

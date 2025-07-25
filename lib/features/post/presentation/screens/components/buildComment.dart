@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/constants/UserActions%20.dart';
+import 'package:social_media_app/core/constants/category.dart';
 import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_media_app/features/post/presentation/screens/replysPage.dart';
+import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 
 class buildComment extends StatefulWidget {
   final Comment comment;
   final String postid;
+  final String topic;
 
-  const buildComment({super.key, required this.comment, required this.postid});
+  const buildComment(
+      {super.key,
+      required this.comment,
+      required this.postid,
+      required this.topic});
 
   @override
   State<buildComment> createState() => _buildCommentState();
@@ -65,7 +73,7 @@ class _buildCommentState extends State<buildComment> {
                         decoration: BoxDecoration(
                           // color:true? Colors.grey[300]: Colors.grey[400],
                           color: comment.isMyComment!
-                              ? Colors.blueGrey[100]
+                              ? Colors.grey[350]
                               : Colors.grey[300],
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -121,19 +129,23 @@ class _buildCommentState extends State<buildComment> {
                             style: TextStyle(color: Colors.grey[600])),
                         const SizedBox(width: 12),
                         InkWell(
-                              onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => Replyspage(
-                                      postid: widget.postid,
-                                      mainComment: comment.copyWith(
-                                        repliedBy: [],
-                                      ),
-                                      commentsIds:(comment.repliedBy.length>0)?[comment.id]: [] ,
-                                    )),
-                          );
-                        },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => Replyspage(
+                                        topic: widget.topic,
+                                        postid: widget.postid,
+                                        mainComment: comment.copyWith(
+                                          repliedBy: [],
+                                        ),
+                                        commentsIds:
+                                            (comment.repliedBy.isNotEmpty)
+                                                ? [comment.id]
+                                                : [],
+                                      )),
+                            );
+                          },
                           child: Icon(Icons.reply_outlined,
                               size: 18, color: Colors.grey[500]),
                         ),
@@ -149,6 +161,7 @@ class _buildCommentState extends State<buildComment> {
                             context,
                             MaterialPageRoute(
                                 builder: (_) => Replyspage(
+                                      topic: widget.topic,
                                       postid: widget.postid,
                                       mainComment: comment.copyWith(
                                         repliedBy: [],

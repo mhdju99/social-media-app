@@ -6,18 +6,12 @@ import 'package:social_media_app/features/realtime/domain/entities/chat_entity.d
 import 'package:social_media_app/features/realtime/domain/repositories/realtime_repository.dart';
 import 'package:social_media_app/features/realtime/data/data_sources/realtime_data_source.dart';
 
-/// RealtimeRepositoryImpl is the concrete implementation of the RealtimeRepository
-/// interface.
-/// This class implements the methods defined in RealtimeRepository to interact
-/// with data. It acts as a bridge between the domain layer
-/// (use cases) and the data layer (data sources).
 class RealtimeRepositoryImpl implements RealtimeRepository {
   final RealtimeDataSource dataSource;
   RealtimeRepositoryImpl(this.dataSource);
+
   @override
   Future<void> connect(String token) async {
-        print("sSSSSSSSS");
-
     await dataSource.connect(token);
   }
 
@@ -33,6 +27,7 @@ class RealtimeRepositoryImpl implements RealtimeRepository {
   @override
   Stream<Map<String, dynamic>> get newNotification =>
       dataSource.newNotification;
+
   @override
   void disconnect() {
     dataSource.disconnect();
@@ -41,15 +36,22 @@ class RealtimeRepositoryImpl implements RealtimeRepository {
   @override
   Stream<Map<String, dynamic>> get messageStream => dataSource.messageStream;
 
+  // ✅ الجدد:
   @override
-  Future<Either<Failure, bool>> isUserOnline(String targetUserId) async {
+  Stream<String> get userOnline => dataSource.userOnline;
+
+  @override
+  Stream<Map<String, dynamic>> get userOffline => dataSource.userOffline;
+
+  @override
+  Future<Either<Failure, Map<String,dynamic> >> isUserOnline(String targetUserId) async {
     try {
-      final bool isUserOnline = await dataSource.isUserOnline(targetUserId);
-      return right(isUserOnline);
+      final Map<String,dynamic>  isOnline = await dataSource.isUserOnline(targetUserId);
+      return right(isOnline);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
-    } catch (a) {
-      return left(Failure(errMessage: a.toString()));
+    } catch (e) {
+      return left(Failure(errMessage: e.toString()));
     }
   }
 
@@ -57,15 +59,24 @@ class RealtimeRepositoryImpl implements RealtimeRepository {
   Future<Either<Failure, ChatEntity>> getChat(String targetUserId) async {
     try {
       final ChatModel chatModel = await dataSource.getChat(targetUserId);
-   final   chats = chatModel.toEntity();
-      return right(chats);
+      return right(chatModel.toEntity());
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
-    } catch (a) {
-      return left(Failure(errMessage: a.toString()));
+    } catch (e) {
+      return left(Failure(errMessage: e.toString()));
     }
   }
-  
-  
 
+  @override
+  Future<Either<Failure, List<ChatEntity>>> getAllChats() async {
+    try {
+      final List<ChatModel> models = await dataSource.getAllChats();
+      final entities = models.map((e) => e.toEntity()).toList();
+      return right(entities);
+    } on ServerException catch (e) {
+      return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (e) {
+      return left(Failure(errMessage: e.toString()));
+    }
+  }
 }

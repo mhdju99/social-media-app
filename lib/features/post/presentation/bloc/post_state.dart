@@ -65,7 +65,7 @@ class PostsLoaded extends PostState {
   }
 
   @override
-  List<Object> get props => [PostDetails];
+  List<Object> get props => [posts];
 }
 final class PostLikeToggled extends PostState {}
 

@@ -21,13 +21,15 @@ import 'package:social_media_app/features/authentication/domain/usecases/verify_
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
 
 final sl = GetIt.instance;
-
 Future<void> init() async {
-  sl.registerLazySingleton<FlutterSecureStorage>(
-      () => const FlutterSecureStorage());
+  if (!sl.isRegistered<FlutterSecureStorage>()) {
+    sl.registerLazySingleton<FlutterSecureStorage>(
+        () => const FlutterSecureStorage());
+  }
 
-  sl.registerFactory(
-    () => AuthenticationBloc(
+  if (!sl.isRegistered<AuthenticationBloc>()) {
+    sl.registerFactory(
+      () => AuthenticationBloc(
         chosePreferredTopicsUsecase: sl(),
         loginUseCase: sl(),
         registerUseCase: sl(),
@@ -36,45 +38,88 @@ Future<void> init() async {
         checkLoginStatusUseCase: sl(),
         requestResetCodeUseCase: sl(),
         verifyResetCodeUseCase: sl(),
-        resetPasswordUseCase: sl()),
-  );
-  sl.registerLazySingleton(() => ChosePreferredTopicsUsecase(repository: sl()));
-
-  sl.registerLazySingleton(() => LoginUserUseCase(sl()));
-  sl.registerLazySingleton(() => RegisterUseCase(sl()));
-  sl.registerLazySingleton(() => AddProfileImageUsecase(repository: sl()));
-  sl.registerLazySingleton(() => LogOutUserUseCase(sl()));
-  sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
-  sl.registerLazySingleton(
-      () => RequestResetcodeUsecase(authenticationRepository: sl()));
-  sl.registerLazySingleton(
-      () => VerifyResetCodeUseCase(authenticationRepository: sl()));
-  sl.registerLazySingleton(
-      () => ResetpasswordUsecase(authenticationRepository: sl()));
-
-  sl.registerLazySingleton<AuthenticationRepository>(
-    () => AuthenticationRepositoryImpl(local: sl(), remot: sl()),
-  );
-  sl.registerLazySingleton<AuthenticationLocalDataSource>(
-    () => AuthenticationLocalDataSourceImpl(cache: sl()),
-  );
-  sl.registerLazySingleton<AuthenticationRemotDataSource>(
-    () => AuthenticationRemotDataSourceImpl(api: sl(), local: sl()),
-  );
-  sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl()));
-  sl.registerLazySingleton<CacheHelper>(() => CacheHelper());
-  sl.registerLazySingleton(() {
-    final dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        sendTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        // validateStatus: (status) => false,
+        resetPasswordUseCase: sl(),
       ),
     );
+  }
 
-    dio.interceptors.add(AuthInterceptor());
+  if (!sl.isRegistered<ChosePreferredTopicsUsecase>()) {
+    sl.registerLazySingleton(
+        () => ChosePreferredTopicsUsecase(repository: sl()));
+  }
 
-    return dio;
-  });
+  if (!sl.isRegistered<LoginUserUseCase>()) {
+    sl.registerLazySingleton(() => LoginUserUseCase(sl()));
+  }
+
+  if (!sl.isRegistered<RegisterUseCase>()) {
+    sl.registerLazySingleton(() => RegisterUseCase(sl()));
+  }
+
+  if (!sl.isRegistered<AddProfileImageUsecase>()) {
+    sl.registerLazySingleton(() => AddProfileImageUsecase(repository: sl()));
+  }
+
+  if (!sl.isRegistered<LogOutUserUseCase>()) {
+    sl.registerLazySingleton(() => LogOutUserUseCase(sl()));
+  }
+
+  if (!sl.isRegistered<CheckAuthStatusUseCase>()) {
+    sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
+  }
+
+  if (!sl.isRegistered<RequestResetcodeUsecase>()) {
+    sl.registerLazySingleton(
+        () => RequestResetcodeUsecase(authenticationRepository: sl()));
+  }
+
+  if (!sl.isRegistered<VerifyResetCodeUseCase>()) {
+    sl.registerLazySingleton(
+        () => VerifyResetCodeUseCase(authenticationRepository: sl()));
+  }
+
+  if (!sl.isRegistered<ResetpasswordUsecase>()) {
+    sl.registerLazySingleton(
+        () => ResetpasswordUsecase(authenticationRepository: sl()));
+  }
+
+  if (!sl.isRegistered<AuthenticationRepository>()) {
+    sl.registerLazySingleton<AuthenticationRepository>(
+      () => AuthenticationRepositoryImpl(local: sl(), remot: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<AuthenticationLocalDataSource>()) {
+    sl.registerLazySingleton<AuthenticationLocalDataSource>(
+      () => AuthenticationLocalDataSourceImpl(cache: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<AuthenticationRemotDataSource>()) {
+    sl.registerLazySingleton<AuthenticationRemotDataSource>(
+      () => AuthenticationRemotDataSourceImpl(api: sl(), local: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<ApiConsumer>()) {
+    sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl()));
+  }
+
+  if (!sl.isRegistered<CacheHelper>()) {
+    sl.registerLazySingleton<CacheHelper>(() => CacheHelper());
+  }
+
+  if (!sl.isRegistered<Dio>()) {
+    sl.registerLazySingleton(() {
+      final dio = Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          sendTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
+      dio.interceptors.add(AuthInterceptor());
+      return dio;
+    });
+  }
 }

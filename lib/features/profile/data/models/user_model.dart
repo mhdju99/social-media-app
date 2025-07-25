@@ -52,11 +52,12 @@ class UserProfileModel {
       birthDate: DateTime.tryParse(json['birthDate'] ?? '') ?? DateTime(1970),
       profileImage: json['profileImage'] ?? '',
       certifiedDoctor: json['certifiedDoctor'] ?? false,
-      followers: (json['followers'] as List)
-          .map((item) => item['_id'].to as String)
-          .toList(),
+      followers:  (json['followers'] as List)
+    .map((item) => item['user'] as String)
+    .toList(),
+
       following: (json['following'] as List)
-          .map((item) => item['_id'] as String)
+          .map((item) => item['user'] as String)
           .toList(),
       blockedUsers: List<String>.from(json['blockedUsers'] ?? []),
       preferredTopics: List<String>.from(json['preferredTopics'] ?? []),

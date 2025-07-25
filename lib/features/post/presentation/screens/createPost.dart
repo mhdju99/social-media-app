@@ -106,10 +106,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 // Post Type Switch
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: ['Post', 'Reels'].map((type) {
+                  children: ['Post ', 'Reels'].map((type) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ChoiceChip(
+                        showCheckmark: false,
                         label: Text(type),
                         selected: _postType == type,
                         onSelected: (_) {
@@ -129,9 +130,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 TextField(
                   controller: _postController,
                   maxLines: 5,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Write something...',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                        // borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(15)),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -140,23 +145,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 const Text('Select Post Topic:',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Wrap(
-                    spacing: 8.0,
-                    children: _topics.map((topic) {
-                      return ChoiceChip(
-                        label: Text(topic),
-                        selected: _selectedTopic == topic,
-                        selectedColor: Colors.blue.shade100,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedTopic = topic;
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
+                Wrap(
+                  spacing: 8.0,
+                  children: _topics.map((topic) {
+                    return ChoiceChip(
+                      showCheckmark: false,
+                      label: Text(topic),
+                      selected: _selectedTopic == topic,
+                      selectedColor: Colors.blue.shade100,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedTopic = topic;
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 20),
 
@@ -228,14 +231,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   builder: (context, state) {
                     return ElevatedButton(
                       onPressed: () {
-                        context.read<PostBloc>().add(
-                              CreatePostRequested(
-                                topic: _selectedTopic,
-                                description: _postController.text,
-                                images: _mediaFiles,
-                                reelFlag: _postType == 'Reels',
-                              ),
-                            );
+                        if (_selectedTopic.isNotEmpty &&
+                            _postController.text.isNotEmpty &&
+                            _mediaFiles.isNotEmpty) {
+                          context.read<PostBloc>().add(
+                                CreatePostRequested(
+                                  topic: _selectedTopic,
+                                  description: _postController.text,
+                                  images: _mediaFiles,
+                                  reelFlag: _postType == 'Reels',
+                                ),
+                              );
+                        } else {
+                          return;
+                        }
                       },
                       child: state is PostLoading
                           ? const CircularProgressIndicator(
