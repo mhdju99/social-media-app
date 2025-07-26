@@ -27,6 +27,8 @@ import 'package:social_media_app/features/realtime/domain/usecases/send_message.
 import 'package:social_media_app/features/realtime/domain/usecases/stream_user_offline_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/stream_user_online_usecase.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/search/search_bloc.dart';
+import 'package:social_media_app/features/search/search_repository.dart';
 import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 import 'package:social_media_app/features/user_tracking/tracker_repository.dart';
 
@@ -85,5 +87,13 @@ if (!sl.isRegistered<GetUserIdUseCase>()) {
   
   sl.registerLazySingleton<TrackerRepository>(
     () => TrackerRepository(api: sl()),
+  );
+  
+  sl.registerFactory(
+    () => SearchBloc(sl()),
+  );
+
+  sl.registerLazySingleton<SearchRepository>(
+    () => SearchRepository(api: sl()),
   );
 }

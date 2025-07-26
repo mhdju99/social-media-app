@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
   Key _chatsKey = UniqueKey();
   Key _profileKey = UniqueKey();
   final List<Widget> _staticPages = [
-    const Homepage(),
+     Homepage(),
     const RellsPage(),
   ];
 

@@ -14,6 +14,8 @@ import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/post/domian/entities/postDetails_entity.dart';
 import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_media_app/features/post/presentation/screens/components/FilterDialog.dart';
+import 'package:social_media_app/features/post/presentation/screens/components/PostCard.dart';
 import 'package:social_media_app/features/post/presentation/screens/createPost.dart';
 import 'package:social_media_app/features/post/presentation/screens/postDetails.dart'
     hide Widget;
@@ -23,6 +25,9 @@ import 'package:social_media_app/features/realtime/presentation/blocs/notificati
 import 'package:social_media_app/features/realtime/presentation/blocs/notification_event.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/notification_state.dart';
 import 'package:social_media_app/features/realtime/presentation/screens/NotificationsPage.dart';
+import 'package:social_media_app/features/search/search_bloc.dart';
+import 'package:social_media_app/features/search/search_delegate.dart';
+import 'package:social_media_app/features/search/search_repository.dart';
 import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -33,14 +38,30 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage>
+    with SingleTickerProviderStateMixin {
   Map<String, dynamic> logs = {};
+  Set<dynamic> ratingPostIds = {};
+  late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
     logs = sl<TrackerBloc>().getlogs();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging == false) {
+        setState(() {});
+      }
+    });
 
     context.read<NotificationBloc>().add(LoadNotificationsEvent());
+  }
+
+  void _prepareRatingPosts(List<Post> posts) {
+    final count = (posts.length * 0.5).round();
+    final indices = _generateUniqueRandomIndices(posts.length, count);
+    ratingPostIds = indices.map((i) => posts[i].id).toSet();
   }
 
   _generateUniqueRandomIndices(int max, int count) {
@@ -102,7 +123,12 @@ class _HomepageState extends State<Homepage> {
                 centerTitle: true,
                 leading: IconButton(
                   icon: Icon(Icons.search, color: Colors.grey[600]),
-                  onPressed: () {},
+                  onPressed: () {
+                    showSearch(
+                        context: context,
+                        delegate: PersonSearchDelegate(
+                            SearchBloc(sl<SearchRepository>())));
+                  },
                 ),
                 actions: [
                   InkWell(
@@ -128,18 +154,61 @@ class _HomepageState extends State<Homepage> {
                   ),
                   const SizedBox(width: 15)
                 ],
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(text: "For You"),
-                    Tab(text: "Follower"),
-                  ],
-                  labelColor: Colors.teal,
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: Colors.teal,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(48),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TabBar(
+                          controller: _tabController,
+                          tabs: [
+                            GestureDetector(
+                              onDoubleTap: () {
+                                if (_tabController.index == 0) {
+                                  _scrollController.animateTo(
+                                    0,
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              },
+                              child: Tab(text: 'For You'),
+                            ),
+                            GestureDetector(
+                              onDoubleTap: () {
+                                if (_tabController.index == 1) {
+                                  _scrollController.animateTo(
+                                    0,
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              },
+                              child: Tab(text: 'Following'),
+                            ),
+                          ],
+                          labelColor: Colors.teal,
+                          unselectedLabelColor: Colors.grey,
+                          indicatorColor: Colors.teal,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.filter_list, color: Colors.grey[700]),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => FilterDialog(),
+                          );
+                        },
+                        tooltip: "Filter",
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],
             body: TabBarView(
+              controller: _tabController,
               children: [
                 _buildPostsView(isFollowing: false),
                 _buildPostsView(isFollowing: true),
@@ -199,8 +268,13 @@ class _HomepageState extends State<Homepage> {
           } else {
             posts = state.posts;
           }
+          if (ratingPostIds.isEmpty && posts.isNotEmpty) {
+            _prepareRatingPosts(posts);
+          }
+
           return RefreshIndicator(
             onRefresh: () async {
+              ratingPostIds.clear();
               final logs = sl<TrackerBloc>().getlogs();
               // context.read<TrackerBloc>().add(SendLogsEvent());
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -211,6 +285,7 @@ class _HomepageState extends State<Homepage> {
               print("💫$logs");
             },
             child: CustomScrollView(
+              controller: _scrollController,
               slivers: [
                 SliverPadding(
                   padding: const EdgeInsets.all(12.0),
@@ -218,16 +293,20 @@ class _HomepageState extends State<Homepage> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final post = posts[index];
-                        final Set<int> ratingpost =
-                            _generateUniqueRandomIndices(
-                                posts.length, (posts.length * 0.5).round());
+                        final showRating = ratingPostIds.contains(post.id);
 
                         // final showindex = index % 3 == 0;
                         return Column(
                           children: [
                             PostCard(
                               post: post,
-                              showDilog: ratingpost.contains(index),
+                              showDilog: showRating,
+                              onRated: () {
+                                // إزالة البوست بعد التقييم
+                                setState(() {
+                                  ratingPostIds.remove(post.id);
+                                });
+                              },
                             ),
                           ],
                         );
@@ -243,409 +322,6 @@ class _HomepageState extends State<Homepage> {
           return const SizedBox();
         }
       },
-    );
-  }
-}
-
-class PostCard extends StatefulWidget {
-  final Post post;
-  bool showDilog;
-
-  PostCard({
-    Key? key,
-    required this.post,
-    required this.showDilog,
-  }) : super(key: key);
-
-  @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  Timer? _viewTimer;
-  Timer? _dilogTimer;
-  bool _hasLoggedView = false;
-
-  void showRatingDialog(
-      {required BuildContext context,
-      required String postId,
-      required int cat}) {
-    int selectedRating = 0;
-    final List<String> ratingLabels = [
-      "Terrible", // 1
-      "Very Bad", // 2
-      "Bad", // 3
-      "Poor", // 4
-      "Below Average", // 5
-      "Average", // 6
-      "Good", // 7
-      "Very Good", // 8
-      "Excellent", // 9
-      "Perfect" // 10
-    ];
-
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text("How do you rate this post?",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Wrap(
-                spacing: 3,
-                children: List.generate(10, (index) {
-                  int rating = index + 1;
-                  return ChoiceChip(
-                    showCheckmark: false,
-                    label: Text(rating.toString()),
-                    selected: selectedRating == rating,
-                    selectedColor: Colors.blue,
-                    onSelected: (_) {
-                      setState(() {
-                        selectedRating = rating;
-                      });
-                    },
-                  );
-                }),
-              ),
-              const SizedBox(height: 16),
-              if (selectedRating > 0)
-                Text(
-                  ratingLabels[selectedRating - 1],
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                )
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: selectedRating > 0
-                  ? () {
-                      // send rating here
-                      print("Rated post $postId with $selectedRating");
-                      Navigator.pop(context);
-                      context.read<TrackerBloc>().add(SendFeedbackEvent(
-                          rating: selectedRating, category: cat));
-                    }
-                  : null,
-              child: const Text("Submit"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _startViewTimer() {
-    if (_hasLoggedView || _viewTimer != null) return;
-
-    _viewTimer = Timer(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      Future.microtask(() {
-        if (mounted) {
-          context.read<TrackerBloc>().add(LogActionEvent(
-                category: category[widget.post.topic]!,
-                action: UserActions.view,
-              ));
-        }
-      });
-    });
-    // _dilogTimer = Timer(const Duration(seconds: 0), () {
-    //   if (widget.showDilog) {
-    //     WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       _ratingView = true;
-    //       if (mounted) {
-    //         // showRatingDialog(
-    //         //   cat: int.parse(category[widget.post.topic]!.split(" ").last),
-    //         //   context: context,
-    //         //   postId: widget.post.id,
-    //         // );
-    //       }
-    //     });
-    //   }
-    // });
-  }
-
-  void _cancelViewTimer() {
-    _viewTimer?.cancel();
-    _viewTimer = null;
-    _dilogTimer?.cancel();
-    _dilogTimer = null;
-  }
-
-  @override
-  void dispose() {
-    _cancelViewTimer();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key("post-${widget.post.id}"),
-      onVisibilityChanged: (visibilityInfo) {
-        if (visibilityInfo.visibleFraction > 0.8) {
-          _startViewTimer();
-        } else {
-          _cancelViewTimer();
-        }
-      },
-      child: Column(
-        children: [
-          Card(
-            color: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (widget.post.isMyPost != null) {
-                        if (widget.post.isMyPost!) {
-                          final result = Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProfileScreen()),
-                          );
-                          return;
-                        }
-                      }
-                      final result = Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => UserProfileScreen(
-                                userId: widget.post.publisher.id)),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.post.publisher.profileImage}",
-                          ),
-                          radius: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(widget.post.publisher.userName,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey[800])),
-                                const Icon(
-                                  Icons.verified,
-                                  color: Colors.blue,
-                                )
-                              ],
-                            ),
-                            Text(formatPostTime(widget.post.createdAt),
-                                style: TextStyle(
-                                    color: Colors.grey[500], fontSize: 12)),
-                          ],
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      final result = Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                                PostDetailsPage(postid: widget.post.id)),
-                      );
-                    },
-                    child: Container(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 12),
-                          Text(widget.post.description,
-                              style: TextStyle(color: Colors.grey[700])),
-                          const SizedBox(height: 12),
-                          PostImagesGrid(
-                            imageUrls: widget.post.images,
-                            postId: widget.post.id,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Row(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  context.read<PostBloc>().add(
-                                      ToggleLikePostRequested(widget.post.id));
-                                  if (!widget.post.isLiked) {
-                                    context.read<TrackerBloc>().add(
-                                        LogActionEvent(
-                                            category:
-                                                category[widget.post.topic]!,
-                                            action: UserActions.like));
-                                  }
-                                },
-                                child: Icon(
-                                  widget.post.isLiked
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  size: 22,
-                                  color: widget.post.isLiked
-                                      ? Colors.red
-                                      : Colors.grey[500],
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                widget.post.likesCount == 0
-                                    ? ''
-                                    : widget.post.likesCount.toString(),
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 12),
-                          InkWell(
-                            onTap: () {
-                              final result = Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => PostDetailsPage(
-                                        postid: widget.post.id)),
-                              );
-                            },
-                            child: Icon(Icons.chat_bubble_outline,
-                                size: 20, color: Colors.grey[500]),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                              widget.post.comments.isEmpty
-                                  ? ''
-                                  : widget.post.comments.length.toString(),
-                              style: TextStyle(color: Colors.grey[600])),
-                          const SizedBox(width: 12),
-                        ],
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-          Visibility(
-            visible: widget.showDilog,
-            child: Column(
-              children: [
-                Center(
-                  child: Icon(Icons.arrow_upward_outlined),
-                ),
-                PostRatingCard(
-                  onRated: (rating) {
-                    setState(() {
-                      widget.showDilog = false;
-                      // print("Rated post $postId with $selectedRating");
-                      context.read<TrackerBloc>().add(
-                          SendFeedbackEvent(rating: rating, category: int.parse(
-                              category[widget.post.topic]!.split(" ").last)));
-                    });
-                  },
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class PostRatingCard extends StatefulWidget {
-  final void Function(int rating) onRated;
-
-  const PostRatingCard({super.key, required this.onRated});
-
-  @override
-  _PostRatingCardState createState() => _PostRatingCardState();
-}
-
-class _PostRatingCardState extends State<PostRatingCard> {
-  int? selectedRating;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "How do you rate this post?",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-            ),
-            GridView.count(
-              padding: const EdgeInsets.only(top: 5),
-              crossAxisCount: 5,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
-              childAspectRatio: 2, // لضبط حجم الأزرار
-              children: List.generate(10, (index) {
-                final rating = index + 1;
-                final isSelected = selectedRating == rating;
-                return ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedRating = rating;
-                      widget.onRated(rating);
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isSelected ? Colors.blue : Colors.grey[200],
-                    foregroundColor: isSelected ? Colors.white : Colors.black,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    textStyle: const TextStyle(fontSize: 12),
-                  ),
-                  child: Text(rating.toString()),
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

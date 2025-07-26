@@ -38,6 +38,7 @@ class EndPoints {
   static String get likeUnlikePostEndPoint => '$baseUrl/posts/like-unlike-post';
   static String get updatePostEndPoint => '$baseUrl/posts/modify-post';
   static String get addCommentEndPoint => '$baseUrl/comments/create-comment';
+  static String get searchusersEndPoint => '$baseUrl/users/search-users';
   static String get recommendEndPoint => 'http://$_baseIp:5000/api/ai/recommend';
   static String get feedbackEndPoint => 'http://$_baseIp:5000/api/ai/feedback';
 }
