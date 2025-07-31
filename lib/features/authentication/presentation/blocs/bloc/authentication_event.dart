@@ -80,5 +80,14 @@ class ResetPasswordRequested extends AuthenticationEvent {
   @override
   List<Object> get props => [newPassword];
 }
+class ResetemailRequested extends AuthenticationEvent {
+  String newPassword;
+  ResetemailRequested({
+    required this.newPassword,
+  });
+
+  @override
+  List<Object> get props => [newPassword];
+}
 
 class toggleRegisterContent extends AuthenticationEvent {}

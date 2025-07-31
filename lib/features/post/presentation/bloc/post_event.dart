@@ -17,9 +17,22 @@ class GetPostRequested extends PostEvent {
 }
 class GetPostsRequested extends PostEvent {
   final bool isRells;
+  List<String>? existingPostIds;
+  Map<String, dynamic>? logs;
+  String? gender;
+  int? maxAge;
+  int? minAge;
+  List<String>? categories;
 
-  const GetPostsRequested({
-  required  this.isRells});
+  GetPostsRequested({
+    required this.isRells,
+    this.existingPostIds,
+    this.logs,
+    this.gender,
+    this.maxAge,
+    this.minAge,
+    this.categories,
+  });
 
   @override
   List<Object?> get props => [isRells];

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/utils/notifications_service.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_state.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/notification_bloc.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/notification_event.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/notification_state.dart';
@@ -22,7 +24,7 @@ class _MainPageState extends State<MainPage> {
   Key _chatsKey = UniqueKey();
   Key _profileKey = UniqueKey();
   final List<Widget> _staticPages = [
-     Homepage(),
+    Homepage(),
     const RellsPage(),
   ];
 
@@ -49,32 +51,50 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<NotificationBloc, NotificationState>(
-      listener: (context, state) {
-        if (state is NotificationUpdated) {
-          print(state.notifications[0]);
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<NotificationBloc, NotificationState>(
+          listener: (context, state) {
+            if (state is NotificationUpdated) {
+              print(state.notifications[0]);
 
-          NotificationService.showNotification(
-            title: 'New Notification',
-            body: state.notifications[0]["text"],
-          );
-          context
-              .read<NotificationBloc>()
-              .add(AddNotificationEvent(state.notifications[0]));
-          // for (var notification in state.notifications) {
-          //   print(notification);
-          //               print(">💨");
+              NotificationService.showNotification(
+                title: 'New Notification',
+                body: state.notifications[0]["text"],
+              );
+              context
+                  .read<NotificationBloc>()
+                  .add(AddNotificationEvent(state.notifications[0]));
+              // for (var notification in state.notifications) {
+              //   print(notification);
+              //               print(">💨");
 
-          //   NotificationService.showNotification(
-          //     title: 'New Notification',
-          //     body: notification["text"],
-          //   );
-          //   context
-          //       .read<NotificationBloc>()
-          //       .add(AddNotificationEvent(notification));
-          // }
-        }
-      },
+              //   NotificationService.showNotification(
+              //     title: 'New Notification',
+              //     body: notification["text"],
+              //   );
+              //   context
+              //       .read<NotificationBloc>()
+              //       .add(AddNotificationEvent(notification));
+              // }
+            }
+          },
+        ),
+      // BlocListener<ChatBloc, ChatState>(
+      //     listener: (context, state) {
+      //       if (state is ChatMessageReceived) {
+      //                      print("💫${state.message}");
+      //       NotificationService.showNotification(
+      //         title: 'message received',
+      //         body: state.message["content"],
+
+      //       );
+      //       context
+      //           .read<NotificationBloc>()
+      //           .add(AddNotificationEvent({"from": "", "to": "", "text": "Message Received < ${state.message["content"]} >", "createdAt": DateTime.now() }));
+      //       } 
+      //     })
+      ],
       child: Scaffold(
         body: IndexedStack(
           index: _selectedIndex,

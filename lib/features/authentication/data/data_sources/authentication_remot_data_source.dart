@@ -37,6 +37,7 @@ abstract class AuthenticationRemotDataSource {
   Future<void> addProfileImage({required File file});
   Future<void> resetPassword(
       {required String token, required String newPassword});
+  Future<void> resetEmail({required String newemail});
 
   Future<void> ChosePreferredTopics({required String Topic});
 }
@@ -66,6 +67,8 @@ class AuthenticationRemotDataSourceImpl
     );
 
     Map<dynamic, dynamic> resposneData = resposne.data;
+    print("☮$resposneData");
+
     UserModel userData = UserModel.fromResponse(resposneData);
     final String? token = resposne.headers.value('authorization');
     if (token == null || token.isEmpty || userData == null) {
@@ -193,5 +196,12 @@ class AuthenticationRemotDataSourceImpl
       throw Exception('Authorization token not found in response headers');
     }
     return token;
+  }
+
+  @override
+  Future<void> resetEmail({required String newemail}) async {
+    var r = await api.put(await EndPoints.changeemailCodeEndPoint,
+        data: {"newEmail": newemail});
+    print("💌$r");
   }
 }

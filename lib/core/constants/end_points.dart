@@ -1,7 +1,7 @@
 import 'package:social_media_app/core/databases/sh_helper.dart';
 
 class EndPoints {
-  static const String _defaultIp = '192.168.250.132';
+  static const String _defaultIp = '192.168.111.132';
   static late String _baseIp;
   static late String baseUrl;
   static late String socketUrl;
@@ -16,6 +16,7 @@ class EndPoints {
   static String get registerEndPoint => '$baseUrl/users/create-account';
   static String get requestResetCodeEndPoint => '$baseUrl/users/request-code';
   static String get verifyResetCodeEndPoint => '$baseUrl/users/verify-code';
+  static String get changeemailCodeEndPoint => '$baseUrl/users/change-email';
   static String get resetPasswordCodeEndPoint => '$baseUrl/user/reset-password';
   static String get addProfileImageEndPoint => '$baseUrl/users/profile-image';
   static String get modifyProfileEndPoint => '$baseUrl/users/modify-profile';

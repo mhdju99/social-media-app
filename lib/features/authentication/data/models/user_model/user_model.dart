@@ -49,7 +49,7 @@ class UserModel {
         location: json['location'] == null
             ? null
             : lo.Location.fromJson(json['location'] as Map<String, dynamic>),
-        id: json['id'] as String? ??"0",
+id: (json['id'] ?? json['_id'] ?? "0").toString(),
         userName: json['userName'] as String?,
         followers: json['followers'] as List<dynamic>?,
         following: json['following'] as List<dynamic>?,

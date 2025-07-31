@@ -77,6 +77,7 @@ class ProfileDataSourceImpl implements ProfileDataSource {
         queryParameters: {"userId": userId});
     UserProfileModel userProfileModel =
         UserProfileModel.fromResponse(response.data);
+
     return userProfileModel;
   }
 

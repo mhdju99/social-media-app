@@ -59,7 +59,10 @@ class UserProfileModel {
       following: (json['following'] as List)
           .map((item) => item['user'] as String)
           .toList(),
-      blockedUsers: List<String>.from(json['blockedUsers'] ?? []),
+blockedUsers: (json['blockedUsers'] as List?)
+              ?.map((item) => item['blockedUserId'].toString())
+              .toList() ??
+          [],
       preferredTopics: List<String>.from(json['preferredTopics'] ?? []),
       location: LocationModel.fromJson(
           json['location'] ?? {'country': '', 'city': ''}),

@@ -125,7 +125,7 @@ class _buildCommentState extends State<buildComment> {
                                 comment.isLiked ? Colors.red : Colors.grey[500],
                           ),
                         ),
-                        Text(comment.likesCount.toString(),
+                        Text(comment.likesCount !=0?comment.likesCount.toString():'',
                             style: TextStyle(color: Colors.grey[600])),
                         const SizedBox(width: 12),
                         InkWell(

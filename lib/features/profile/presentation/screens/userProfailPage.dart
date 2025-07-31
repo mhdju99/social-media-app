@@ -18,9 +18,9 @@ import 'package:social_media_app/features/realtime/presentation/blocs/chat_event
 import 'package:social_media_app/features/realtime/presentation/screens/chatPage.dart';
 
 class UserProfileScreen extends StatelessWidget {
-  final String userId; // معرف المستخدم الذي نعرض صفحته
+  String userId; // معرف المستخدم الذي نعرض صفحته
 
-  const UserProfileScreen({super.key, required this.userId});
+  UserProfileScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +32,52 @@ class UserProfileScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(
-                state is ProfileSuccess<UserProfile> ? state.data.userName : "",
-                style: const TextStyle(color: Colors.black),
+              title: Row(
+                children: [
+                  Text(
+                    state is ProfileSuccess<UserProfile>
+                        ? state.data.userName
+                        : "",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ],
               ),
               backgroundColor: Colors.white,
               elevation: 1,
-              actions:  [
-                Icon(Icons.menu, color: Colors.black),
-                SizedBox(width: 16),
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    // التعامل مع العنصر المختار
+                    if (value == 'block') {
+                      context
+                          .read<ProfileBloc>()
+                          .add(BlockUnblockUserEvent(userId));
+                      context
+                          .read<ProfileBloc>()
+                          .add(GetUserProfileEvent(userId));
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'block',
+                      child: ListTile(
+                        title: Text("block"),
+                        leading: Icon(Icons.block),
+                      ),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_vert), // أيقونة الثلاث نقاط
+                ),
+                const SizedBox(width: 16),
                 InkWell(
                     onTap: () {
                       context
                           .read<ProfileBloc>()
                           .add(GetUserProfileEvent(userId));
                     },
-                    child: Icon(Icons.refresh, color: Colors.black)),                SizedBox(width: 16),
-
+                    child: const Icon(Icons.refresh, color: Colors.black)),
+                const SizedBox(width: 16),
               ],
             ),
             backgroundColor: Colors.grey[100],
@@ -136,7 +165,7 @@ class UserProfileScreen extends StatelessWidget {
                   label: 'Followers',
                   ontap: () {
                     if (user.followers.isNotEmpty) {
-                         print("uu💘");
+                      print("uu💘");
                       print(user.following);
                       Navigator.push(
                         context,
@@ -152,7 +181,7 @@ class UserProfileScreen extends StatelessWidget {
                   count: user.following.length.toString(),
                   label: 'Following',
                   ontap: () {
-                       print("uu💘");
+                    print("uu💘");
                     print(user.following);
                     if (user.following.isNotEmpty) {
                       Navigator.push(
@@ -179,8 +208,21 @@ class UserProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("${user.firstName} ${user.lastName}",
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Text(
+                  "${user.certifiedDoctor ? "Dr. " : ""}${user.firstName} ${user.lastName}",
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(
+                width: 4,
+              ),
+              if (user.certifiedDoctor)
+                const Icon(
+                  Icons.medical_services,
+                  color: Colors.blue,
+                )
+            ],
+          ),
           Text((user.about != null) ? user.about.toString() : ""),
           const SizedBox(height: 10),
           Row(
@@ -190,9 +232,13 @@ class UserProfileScreen extends StatelessWidget {
                   onPressed: () {
                     // تنفيذ عملية المتابعة (تابع من خلال bloc أو API حسب نظامك)
                     // مثال:
-                    context.read<ProfileBloc>().add(FollowUnfollowUserEvent(userId));
+                    context
+                        .read<ProfileBloc>()
+                        .add(FollowUnfollowUserEvent(userId));
                   },
-                  child: user.isfollow? Text('unFollow'): Text('Follow'),
+                  child: user.isfollow
+                      ? const Text('unFollow')
+                      : const Text('Follow'),
                 ),
               ),
               const SizedBox(width: 8),
@@ -201,7 +247,10 @@ class UserProfileScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ChatPage(targetUserId: userId,user: user,),
+                      builder: (_) => ChatPage(
+                        targetUserId: userId,
+                        user: user,
+                      ),
                     ),
                   );
                 },

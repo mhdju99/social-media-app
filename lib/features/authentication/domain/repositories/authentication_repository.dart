@@ -21,16 +21,16 @@ abstract class AuthenticationRepository {
     required String lastName,
     required String birthDate,
     required String email,
-          required String gender,
-
+    required String gender,
     required String password,
     required String country,
     required String city,
     required List<String> preferredTopics,
   });
   Future<void> logOut();
-   Future<Map<String, dynamic>> isUserLogIn();
- Future<String?> fetchCachedUserId();
+  Future<Either<Failure, void>> changeemail({required String newPassword});
+  Future<Map<String, dynamic>> isUserLogIn();
+  Future<String?> fetchCachedUserId();
   Future<Either<Failure, void>> requestResetCode({required String email});
   Future<Either<Failure, String>> verifyResetCode(
       {required String email, required String code});

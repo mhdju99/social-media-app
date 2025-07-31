@@ -43,15 +43,16 @@ class NotificationModel extends NotificationEntity with HiveObjectMixin {
           date: date,
           isRead: isRead,
         );
-
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      actorId: json['actorId'],
-      userName: json['userName'],
-      profileImage: json['profileImage'],
-      text: json['text'],
-      postId: json['postId'],
-      date: DateTime.parse(json['date']),
+      actorId: json['actorId'] ?? '',
+      userName: json['userName'] ?? '',
+      profileImage: json['profileImage'] ?? '',
+      text: json['text'] ?? '',
+      postId: json['postId'] ?? '',
+      date: json['date'] != null
+          ? DateTime.tryParse(json['date']) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 

@@ -10,11 +10,12 @@ import 'package:social_media_app/core/databases/api/api_consumer.dart';
 import 'package:social_media_app/core/errors/expentions.dart';
 import 'package:social_media_app/core/utils/logger.dart';
 import 'package:social_media_app/features/authentication/data/data_sources/authentication_local_data_source.dart';
-import 'package:social_media_app/features/authentication/data/models/user_model/user_model.dart';
+
 import 'package:social_media_app/features/authentication/domain/entities/user_entity/user_entity.dart';
 import 'package:social_media_app/features/post/data/models/post_model/first_layer_comment.dart';
 import 'package:social_media_app/features/post/data/models/post_model/postDetailsModel.dart';
 import 'package:social_media_app/features/post/data/models/post_model/post_model.dart';
+import 'package:social_media_app/features/post/data/models/post_model/user.dart';
 
 /// AuthenticationDataSource is an abstract class defining the contract for fetching
 /// data from various sources.
@@ -34,9 +35,17 @@ abstract class PostRemotDataSource {
       List<String>? deleteImagesIds});
   Future<void> deletePost({required String postId});
   Future<PostDetailsModel> getPostDetails({required String postId});
-   Future<List<PostModel>>  getPosts({required bool isRells});
+  Future<List<PostModel>> getPosts({
+    required bool isRells,
+    List<String>? existingPostIds,
+    List<String>? topic,
+    Map<String, dynamic>? logs,
+    String? gender,
+    int? min,
+    int? max,
+  });
   Future<void> likeUnlikePost({required String postId});
-  Future<void> addComment({
+  Future<Map<String, dynamic>> addComment({
     required String postId,
     required String content,
     String? repliedTo,
@@ -60,7 +69,7 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
   });
 
   @override
-  Future<void> addComment(
+  Future<Map<String, dynamic>> addComment(
       {required String postId,
       String? repliedTo,
       required String content}) async {
@@ -71,7 +80,13 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
 
     if (repliedTo != null) data['repliedTo'] = repliedTo;
 
-    await api.post(await EndPoints.addCommentEndPoint, data: data);
+    Response response =
+        await api.post(await EndPoints.addCommentEndPoint, data: data);
+    Map<String, dynamic> resposneData = response.data;
+    // CommentModel commentMOdel = CommentModel.fromJson(resposneData['comment']);
+    UserModel userMOdel = UserModel.fromJson(resposneData['user']);
+
+    return {"comment": resposneData["comment"]['_id'], "user": userMOdel};
   }
 
   @override
@@ -90,14 +105,15 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
         MapEntry(
           'images',
           await MultipartFile.fromFile(image.path,
-              contentType:reelFlag? MediaType('video', 'mp4')
-                  :MediaType('image', 'jpeg'),
+              contentType: reelFlag
+                  ? MediaType('video', 'mp4')
+                  : MediaType('image', 'jpeg'),
               filename: image.path.split('/').last),
         ),
       );
     }
-    await api.post(await
-      EndPoints.createPostEndPoint,
+    await api.post(
+      await EndPoints.createPostEndPoint,
       data: formData,
     );
   }
@@ -110,7 +126,8 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
 
   @override
   Future<void> likeUnlikePost({required String postId}) async {
-    await api.put(await EndPoints.likeUnlikePostEndPoint, data: {"postId": postId});
+    await api
+        .put(await EndPoints.likeUnlikePostEndPoint, data: {"postId": postId});
   }
 
   @override
@@ -119,7 +136,7 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
       required String describtion,
       List<File>? images,
       List<String>? deleteImagesIds}) async {
-final formData = FormData.fromMap({
+    final formData = FormData.fromMap({
       'description': describtion,
       if (deleteImagesIds != null && deleteImagesIds.isNotEmpty)
         'deleteImagesIds': deleteImagesIds.join('-'),
@@ -139,15 +156,16 @@ final formData = FormData.fromMap({
         );
       }
     }
-    await api.patch(await EndPoints.updatePostEndPoint, data: formData, header: {
+    await api
+        .patch(await EndPoints.updatePostEndPoint, data: formData, header: {
       "post-id": postId.toString(),
     });
   }
 
   @override
   Future<PostDetailsModel> getPostDetails({required String postId}) async {
-    Response response = await api
-        .get(await EndPoints.getPostEndPoint, queryParameters: {"postId": postId});
+    Response response = await api.get(await EndPoints.getPostEndPoint,
+        queryParameters: {"postId": postId});
 
     Map<String, dynamic> resposneData = response.data;
     PostDetailsModel postModel = PostDetailsModel.fromResponse(resposneData);
@@ -160,8 +178,8 @@ final formData = FormData.fromMap({
   Future<void> likeUnlikeComment({required String commentId}) async {
     debugPrint("❤");
     debugPrint(commentId);
-    await api.put(await
-      EndPoints.likeCommentEndPoint,
+    await api.put(
+      await EndPoints.likeCommentEndPoint,
       data: {"commentId": commentId},
     );
   }
@@ -169,35 +187,52 @@ final formData = FormData.fromMap({
   @override
   Future<void> deleteComment({required String commentId}) async {
     final x = await api.delete(
-      await
-      EndPoints.deleteCommentEndPoint,
+      await EndPoints.deleteCommentEndPoint,
       queryParameters: {"commentId": commentId},
     );
- 
   }
 
   @override
   Future<List<CommentModel>> getReplies(
       {required List<String> commentIds}) async {
     final response = await api.get(
-      await
-      EndPoints.getRepliesEndPoint,
+      await EndPoints.getRepliesEndPoint,
       queryParameters: {"commentsIds": commentIds.join(',')},
     );
 
     final data = response.data['replies'] as List;
     return data.map((json) => CommentModel.fromJson(json)).toList();
   }
-  
-  @override
-  Future<List<PostModel>> getPosts({required bool isRells}) async {
-    final response = await api.post(
-      await
-      EndPoints.getPostsEndPoint,
-      data: {"reelFlag":isRells},
-    );
-          print("🕳$response");
 
+  @override
+  Future<List<PostModel>> getPosts({
+    required bool isRells,
+    List<String>? existingPostIds,
+    List<String>? topic,
+    Map<String, dynamic>? logs,
+    String? gender,
+    int? min,
+    int? max,
+  }) async {
+    final Map<String, dynamic> datamap = {};
+
+    if (isRells != null) datamap['reelFlag'] = isRells;
+    if (existingPostIds != null) datamap['existingPostIds'] = existingPostIds;
+
+    if (topic != null) datamap['categories'] = topic;
+    if (logs != null) datamap['logs'] = logs;
+    if (gender != null) datamap['gender'] = gender;
+    if (min != null) datamap['min'] = min;
+    if (max != null) datamap['max'] = max;
+     datamap['postsNumber'] = 3;
+    print("🈹$datamap");
+    print("cat🈹$datamap['categories']");
+    print("data🈹$topic");
+    final response = await api.post(
+      await EndPoints.getPostsEndPoint,
+      data: datamap,
+    );
+    print("🕳$response");
 
     final data = response.data as List;
     return data.map((json) => PostModel.fromJson(json)).toList();

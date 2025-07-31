@@ -11,6 +11,7 @@ sealed class AuthenticationState extends Equatable {
 final class AuthenticationInitial extends AuthenticationState {}
 
 class AuthLoading extends AuthenticationState {}
+class sendemail extends AuthenticationState {}
 
 class AuthSuccess extends AuthenticationState {
   final UserEntity user;

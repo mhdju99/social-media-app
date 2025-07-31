@@ -16,6 +16,7 @@ import 'package:social_media_app/features/authentication/domain/usecases/login_u
 import 'package:social_media_app/features/authentication/domain/usecases/logout_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/register_usecase.dart.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/request_resetcode_usecase.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/reset_email_usecas.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/reset_password_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/verify_resetcode_usecase.dart';
 import 'package:social_media_app/features/authentication/presentation/blocs/bloc/authentication_bloc.dart';
@@ -39,6 +40,8 @@ Future<void> init() async {
         requestResetCodeUseCase: sl(),
         verifyResetCodeUseCase: sl(),
         resetPasswordUseCase: sl(),
+        resetemailUsecase: sl(),
+
       ),
     );
   }
@@ -81,6 +84,10 @@ Future<void> init() async {
   if (!sl.isRegistered<ResetpasswordUsecase>()) {
     sl.registerLazySingleton(
         () => ResetpasswordUsecase(authenticationRepository: sl()));
+  }
+  if (!sl.isRegistered<ResetemailUsecase>()) {
+    sl.registerLazySingleton(
+        () => ResetemailUsecase(authenticationRepository: sl()));
   }
 
   if (!sl.isRegistered<AuthenticationRepository>()) {

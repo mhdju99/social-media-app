@@ -104,7 +104,18 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return left(Failure(errMessage: "somthing wrong"));
     }
   }
-
+@override
+  Future<Either<Failure, void>> changeemail(
+      {required String newPassword}) async {
+    try {
+      await remot.resetEmail(newemail: newPassword);
+      return right(null);
+    } on ServerException catch (e) {
+      return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: a.toString()));
+    }
+  }
   @override
   Future<Either<Failure, void>> requestResetCode(
       {required String email}) async {

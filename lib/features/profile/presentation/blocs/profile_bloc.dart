@@ -54,12 +54,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
         (userProfile) {
-
           debugPrint(userProfile.toString());
           bool isfollow = userProfile.followers.contains(userId);
-                              debugPrint("isfollow");
+          debugPrint("isfollow");
 
-                    debugPrint(isfollow.toString());
+          debugPrint(isfollow.toString());
 
           emit(ProfileSuccess(userProfile.copyWith(isfollow: isfollow)));
         },
@@ -111,16 +110,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       );
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
-        (_) => emit(ProfileSuccess("تم تغيير كلمة المرور")),
+        (_) {
+                        print("☪done");
+
+          emit(changedpassword());
+        },
       );
     });
 
     on<BlockUnblockUserEvent>((event, emit) async {
-      emit(ProfileLoading());
       final result = await blockUnblockUsecase(event.userId);
       result.fold(
         (failure) => emit(ProfileFailure(failure.errMessage)),
-        (_) => emit(ProfileSuccess("تم تعديل حالة الحظر")),
+        (_) => null,
       );
     });
 

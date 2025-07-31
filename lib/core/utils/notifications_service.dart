@@ -1,13 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:social_media_app/main.dart';
+
+// استيراد navigatorKey من main.dart (قم بتعديل المسار حسب الحاجة)
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin plugin =
       FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
-    // استخدم أيقونة مناسبة موجودة في res/drawable
     const android = AndroidInitializationSettings('ic_notification');
-
     const ios = DarwinInitializationSettings();
 
     const settings = InitializationSettings(
@@ -22,7 +24,6 @@ class NotificationService {
       },
     );
 
-    // إنشاء قناة إشعار
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'default_channel',
       'Default Notifications',
@@ -40,13 +41,22 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
+    // ✅ منع الإشعار إذا كنت داخل صفحة ChatPage
+    final context = navigatorKey.currentContext;
+    final routeName = ModalRoute.of(context!)?.settings.name;
+
+    if (routeName == '/chatPage') {
+      print('📵 إشعار تم تجاهله لأن المستخدم في صفحة المحادثة');
+      return;
+    }
+
     const androidDetails = AndroidNotificationDetails(
       'default_channel',
       'Default Notifications',
       channelDescription: 'Channel for default notifications',
       importance: Importance.max,
       priority: Priority.high,
-      icon: 'ic_notification', // تأكد أنها موجودة في drawable
+      icon: 'ic_notification',
     );
 
     const notificationDetails = NotificationDetails(

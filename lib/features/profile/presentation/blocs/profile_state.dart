@@ -9,6 +9,7 @@ sealed class ProfileState extends Equatable {
 class ProfileInitial extends ProfileState {}
 
 class ProfileLoading extends ProfileState {}
+class changedpassword extends ProfileState {}
 
 class ProfileFailure extends ProfileState {
   final String message;

@@ -7,7 +7,7 @@ class AddComment {
 
   AddComment(this.repository);
 
-  Future<Either<Failure, void>> call({
+  Future<Either<Failure, Map<String, dynamic>>> call({
     required String postId,
     required String content,
       String? repliedTo,

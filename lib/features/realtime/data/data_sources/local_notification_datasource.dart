@@ -13,7 +13,7 @@ class LocalNotificationDataSource {
     return box.values.toList();
   }
 
-Future<void> markAsRead() async {
+  Future<void> markAsRead() async {
     final box = await Hive.openBox<NotificationModel>(BoxKeys.notifications);
     for (int i = 0; i < box.length; i++) {
       final item = box.getAt(i);
@@ -23,5 +23,4 @@ Future<void> markAsRead() async {
       }
     }
   }
-
 }

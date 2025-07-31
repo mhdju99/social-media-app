@@ -17,6 +17,21 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   int selectedFilterIndex = 0;
+  IconData _detectTypeFromText(String text) {
+    if (text.contains('started following')) return Icons.person_add;
+    ;
+    if (text.contains('liked your post')) return Icons.favorite;
+    ;
+    if (text.contains('liked your comment')) return Icons.favorite;
+    if (text.contains('commented on')) return Icons.comment;
+    ;
+    if (text.contains('replied to')) return Icons.reply;
+    ;
+    if (text.contains('Message Received')) return Icons.message;
+    ;
+    return Icons.notifications;
+    ;
+  }
 
   @override
   void initState() {
@@ -165,14 +180,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.teal.withOpacity(0.1),
-            backgroundImage: notification.profileImage.isNotEmpty
-                ? NetworkImage(notification.profileImage)
-                : null,
-            child: notification.profileImage.isEmpty
-                ? const Icon(Icons.notifications, color: Colors.teal)
-                : null,
+          Container(
+            width: 40, // يمكن تعديل الحجم حسب الحاجة
+            height: 40, // نفس القيمة لجعلها دائرة
+            decoration: BoxDecoration(
+              color: Colors.teal.withOpacity(0.1),
+              shape: BoxShape.circle, // هذا يجعل الشكل دائريًا
+            ),
+            child: Icon(
+              _detectTypeFromText(notification.text),
+              color: Colors.teal,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

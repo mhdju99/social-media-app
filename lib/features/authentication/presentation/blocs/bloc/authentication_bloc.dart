@@ -15,6 +15,7 @@ import 'package:social_media_app/features/authentication/domain/usecases/check_a
 import 'package:social_media_app/features/authentication/domain/usecases/login_usecase.dart.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/logout_usecase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/register_usecase.dart.dart';
+import 'package:social_media_app/features/authentication/domain/usecases/reset_email_usecas.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/reset_password_usecase.dart';
 import 'package:test/test.dart';
 
@@ -34,6 +35,7 @@ class AuthenticationBloc
   final RequestResetcodeUsecase requestResetCodeUseCase;
   final VerifyResetCodeUseCase verifyResetCodeUseCase;
   final ResetpasswordUsecase resetPasswordUseCase;
+  final ResetemailUsecase resetemailUsecase;
   final ChosePreferredTopicsUsecase chosePreferredTopicsUsecase;
   String _resetToken = "";
   String get resetToken => _resetToken;
@@ -57,6 +59,7 @@ class AuthenticationBloc
     required this.requestResetCodeUseCase,
     required this.verifyResetCodeUseCase,
     required this.resetPasswordUseCase,
+    required this.resetemailUsecase,
   }) : super(AuthenticationInitial()) {
     on<LogInRequested>(_handelLogin);
     on<RegisterRequested>(_handleRegister);
@@ -68,6 +71,7 @@ class AuthenticationBloc
       _handleVerifyResetCode,
     );
     on<ResetPasswordRequested>(_handleResetPassword);
+    on<ResetemailRequested>(_handlechangeemail);
     on<ChosePreferredTopicsRequested>(_handleChosePreferredTopic);
     // on<toggleRegisterContent>(_handletoggleRegister);
   }
@@ -83,7 +87,17 @@ class AuthenticationBloc
       (_) => emit(AuthCodeRequestedSuccess(event.email)),
     );
   }
+  FutureOr<void> _handlechangeemail(
+      ResetemailRequested event, emit) async {
+    emit(AuthLoading());
 
+    final result = await resetemailUsecase(newPassword: event.newPassword);
+
+    result.fold(
+      (failure) => emit(AuthFailure(failure.errMessage)),
+      (_) => emit(sendemail()),
+    );
+  }
   FutureOr<void> _handleResetPassword(
       ResetPasswordRequested event, emit) async {
     String? token;

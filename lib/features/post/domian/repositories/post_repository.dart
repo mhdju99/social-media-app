@@ -26,10 +26,19 @@ abstract class PostRepository {
   });
   Future<Either<Failure, void>> deletePost({required String postId});
     Future<Either<Failure, PostDetails>> getPostDetails({required String postId});
-  Future<Either<Failure, List<Post>>> getPosts({required bool isRells});
+  Future<Either<Failure, List<Post>>> getPosts({
+    required bool isRells,
+    List<String>? existingPostIds,
+        List<String>? topic,
+
+    Map<String, dynamic>? logs,
+    String? gender,
+    int? maxAge,
+    int? minAge,
+  });
 
   Future<Either<Failure, void>> likeUnlikePost({required String postId});
-  Future<Either<Failure, void>> addComment({
+  Future<Either<Failure, Map<String, dynamic>>> addComment({
         String? repliedTo,
 
     required String postId,

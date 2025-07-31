@@ -25,12 +25,17 @@ class ProfileScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<ProfileBloc>()..add(const GetMyProfileEvent()),
       child: BlocConsumer<ProfileBloc, ProfileState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          
+        },
         builder: (context, state) {
           return Scaffold(
 
             
-            endDrawer: const CustomDrawer(),
+            endDrawer:  CustomDrawer(user: state is ProfileSuccess<UserProfile>
+                  ? state.data
+                  : null,
+            ),
             appBar: AppBar(
               actions: [
                 SizedBox(width: 10,),

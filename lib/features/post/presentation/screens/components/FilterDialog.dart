@@ -10,7 +10,14 @@ class _FilterDialogState extends State<FilterDialog> {
   double minAge = 18;
   double maxAge = 50;
 
-  final List<String> topics = ['Sports', 'Technology', 'Art', 'News', 'Music'];
+  final List<String> topics = [
+    "Anxiety & Stress Management",
+    "Depression & Mood Disorders",
+    "Relationships & Interpersonal Issues",
+    "Self-Esteem & Identity",
+    "Trauma & PTSD",
+    "Growth, Healing & Motivation",
+  ];
   final Set<String> selectedTopics = {};
 
   @override
@@ -27,7 +34,7 @@ class _FilterDialogState extends State<FilterDialog> {
             Row(
               children: [
                 Radio<String>(
-                  value: 'Male',
+                  value: 'male',
                   groupValue: selectedGender,
                   onChanged: (value) {
                     setState(() => selectedGender = value!);
@@ -35,7 +42,7 @@ class _FilterDialogState extends State<FilterDialog> {
                 ),
                 Text('Male'),
                 Radio<String>(
-                  value: 'Female',
+                  value: 'female',
                   groupValue: selectedGender,
                   onChanged: (value) {
                     setState(() => selectedGender = value!);

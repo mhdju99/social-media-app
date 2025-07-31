@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:social_media_app/features/post/data/models/post_model/user.dart';
 import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
 import 'package:social_media_app/features/profile/domain/usecases/GetUserProfileUsecase.dart';
 import 'package:test/test.dart';
@@ -111,7 +112,15 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           following = me.following;
         },
       );
-      final result = await getPosts(event.isRells);
+      final result = await getPosts(
+          isRells: event.isRells,
+          topic: event.categories,
+          existingPostIds: event.existingPostIds,
+          gender: event.gender,
+          logs: event.logs,
+          maxAge: event.maxAge,
+          minAge: event.minAge);
+
 
       result.fold(
         (l) {
@@ -124,11 +133,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             final isLikedPost = post.likes.contains(userId);
             final isFollowME = following.contains(post.publisher.id);
 
-            return post.copyWith(isMyPost: isMyPost, isLiked: isLikedPost,
-            publisher: post.publisher.copyWith(
-              isfollowMe: isFollowME
-            )
-            );
+            return post.copyWith(
+                isMyPost: isMyPost,
+                isLiked: isLikedPost,
+                publisher: post.publisher.copyWith(isfollowMe: isFollowME));
           }).toList();
 
           emit(PostsLoaded(updatedPosts));
@@ -344,13 +352,17 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             // emit(currentState.copyWith(errorMessage: "حدث خطأ أثناء الإعجاب"));
             // emit(currentState.copyWith(errorMessage: null));
           },
-          (_) {
+          (comment) {
+            print("💘${comment["comment"]}");
+            print("💘${comment["user"]}");
+            UserModel userModel = comment["user"]; // تحويل إلى كائن UserModel
             final updatedComments = List<Comment>.from(post.comments)
               ..add(Comment(
                   likesCount: 0,
-                  id: "",
+                  id: comment["comment"],
                   content: event.comments,
-                  user: User(id: "", userName: "hhhhhmod0", profileImage: ""),
+                  user: userModel
+                      .toEntity(), // ثم استدعاء toEntity() لتحويله إلى كائن User
                   repliedBy: [],
                   likedBy: [],
                   createdAt: DateTime.now()));
@@ -370,19 +382,19 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             // emit(currentState.copyWith(errorMessage: "حدث خطأ أثناء الإعجاب"));
             // emit(currentState.copyWith(errorMessage: null));
           },
-          (_) {
+          (comment) {
+                        UserModel userModel = comment["user"]; // تحويل إلى كائن UserModel
+
             final updatedComments = List<Comment>.from(post!)
-              ..add(
-                Comment(
-                  id: "",
+           ..add(Comment(
+                  likesCount: 0,
+                  id: comment["comment"],
                   content: event.comments,
-                  user: User(id: "", userName: "hhhhhmod0", profileImage: ""),
+                  user: userModel
+                      .toEntity(), // ثم استدعاء toEntity() لتحويله إلى كائن User
                   repliedBy: [],
                   likedBy: [],
-                  createdAt: DateTime.now(),
-                  likesCount: 0,
-                ),
-              );
+                  createdAt: DateTime.now())) ;
             emit(currentState.copyWith(replies: updatedComments));
           },
         );

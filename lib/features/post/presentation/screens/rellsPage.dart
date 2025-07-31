@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/constants/end_points.dart';
 import 'package:social_media_app/core/injection_container.dart';
+import 'package:social_media_app/core/utils/notifications_service.dart';
 import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/post/domian/entities/postDetails_entity.dart';
 import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
@@ -10,6 +11,11 @@ import 'package:social_media_app/features/post/presentation/screens/components/R
 import 'package:social_media_app/features/post/presentation/screens/createPost.dart';
 import 'package:social_media_app/features/post/presentation/screens/postDetails.dart'
     hide Widget;
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_state.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_event.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/notification_state.dart';
 
 class RellsPage extends StatefulWidget {
   const RellsPage({super.key});
@@ -23,84 +29,101 @@ class _RellsPageState extends State<RellsPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          sl<PostBloc>()..add(const GetPostsRequested(isRells: true)),
-      child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 1,
-          title: Text('Reels', style: TextStyle(color: Colors.grey[800])),
-          centerTitle: true,
-        ),
-        body: BlocConsumer<PostBloc, PostState>(
-          listener: (context, state) {
-            // if (state is LikeCommentFalier) {
-            //   ScaffoldMessenger.of(context).showSnackBar(
-            //     SnackBar(
-            //       elevation: 4,
-            //       content: Text(state.message),
-            //       behavior: SnackBarBehavior.floating,
-            //       backgroundColor: Colors.black87,
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12),
-            //       ),
-            //       duration: const Duration(seconds: 2),
-            //       margin: const EdgeInsets.all(16),
-            //     ),
-            //   );
-            // } else if (state is delDone) {
-            //   Navigator.pop(context, 'refresh');
-            // }
-          },
-          buildWhen: (previous, current) => current is! LikeCommentFalier,
-          builder: (context, state) {
-            if (state is PostLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is PostError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("somthig wrong"),
-                    IconButton(
-                        onPressed: () {
-                          context
-                              .read<PostBloc>()
-                              .add(const GetPostsRequested(isRells: false));
-                        },
-                        icon: const Icon(Icons.refresh))
-                  ],
-                ),
-              );
-            } else if (state is PostsLoaded) {
-              final posts = state.posts;
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context
-                      .read<PostBloc>()
-                      .add(const GetPostsRequested(isRells: true));
-                },
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.all(12.0),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final post = posts[index];
-                            return PostCard(post: post);
+          sl<PostBloc>()..add(GetPostsRequested(isRells: true)),
+      child: BlocListener<ChatBloc, ChatState>(
+        listener: (context, state) {
+          // if (state is ChatMessageReceived) {
+          //   print("💫${state.message}");
+          //   NotificationService.showNotification(
+          //     title: 'message received b',
+          //     body: state.message["content"],
+          //   );
+          //   context.read<NotificationBloc>().add(AddNotificationEvent({
+          //         "from": "",
+          //         "to": "",
+          //         "text": "Message Received < ${state.message["content"]} >",
+          //         "createdAt": DateTime.now()
+          //       }));
+          // }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.grey[200],
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 1,
+            title: Text('Reels', style: TextStyle(color: Colors.grey[800])),
+            centerTitle: true,
+          ),
+          body: BlocConsumer<PostBloc, PostState>(
+            listener: (context, state) {
+              // if (state is LikeCommentFalier) {
+              //   ScaffoldMessenger.of(context).showSnackBar(
+              //     SnackBar(
+              //       elevation: 4,
+              //       content: Text(state.message),
+              //       behavior: SnackBarBehavior.floating,
+              //       backgroundColor: Colors.black87,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(12),
+              //       ),
+              //       duration: const Duration(seconds: 2),
+              //       margin: const EdgeInsets.all(16),
+              //     ),
+              //   );
+              // } else if (state is delDone) {
+              //   Navigator.pop(context, 'refresh');
+              // }
+            },
+            buildWhen: (previous, current) => current is! LikeCommentFalier,
+            builder: (context, state) {
+              if (state is PostLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is PostError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("somthig wrong"),
+                      IconButton(
+                          onPressed: () {
+                            context
+                                .read<PostBloc>()
+                                .add(GetPostsRequested(isRells: false));
                           },
-                          childCount: posts.length,
+                          icon: const Icon(Icons.refresh))
+                    ],
+                  ),
+                );
+              } else if (state is PostsLoaded) {
+                final posts = state.posts;
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context
+                        .read<PostBloc>()
+                        .add(GetPostsRequested(isRells: true));
+                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.all(12.0),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final post = posts[index];
+                              return PostCard(post: post);
+                            },
+                            childCount: posts.length,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return const SizedBox();
-            }
-          },
+                    ],
+                  ),
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
+          ),
         ),
       ),
     );

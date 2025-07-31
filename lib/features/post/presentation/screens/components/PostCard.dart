@@ -151,10 +151,10 @@ class _PostCardState extends State<PostCard> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.grey[800])),
-                                const Icon(
-                                  Icons.verified,
-                                  color: Colors.blue,
-                                )
+                                // const Icon(
+                                //   Icons.verified,
+                                //   color: Colors.blue,
+                                // )
                               ],
                             ),
                             Text(formatPostTime(widget.post.createdAt),

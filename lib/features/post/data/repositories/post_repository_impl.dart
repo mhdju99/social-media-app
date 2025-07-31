@@ -14,19 +14,20 @@ class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl(this.postRemotDataSource);
 
   @override
-  Future<Either<Failure, void>> addComment({
+  Future<Either<Failure, Map<String, dynamic>>> addComment({
     required String postId,
     required String content,
     String? repliedTo,
   }) async {
     try {
-      await postRemotDataSource.addComment(
+      Map<String, dynamic> result = await postRemotDataSource.addComment(
         postId: postId,
         content: content,
         repliedTo: repliedTo,
       );
       // await local.saveToken(user.)
-      return right(null);
+      print("💘${{"comment": result["comment"], "user": result["user"]}}");
+      return right({"comment": result["comment"], "user": result["user"]});
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
@@ -157,9 +158,29 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, List<Post>>> getPosts({required bool isRells}) async {
+  Future<Either<Failure, List<Post>>> getPosts({
+    required bool isRells,
+    List<String>? existingPostIds,
+    List<String>? topic,
+    Map<String, dynamic>? logs,
+    String? gender,
+    int? maxAge,
+    int? minAge,
+  }) async {
     try {
-      final PostModels = await postRemotDataSource.getPosts(isRells: isRells);
+      final PostModels = await postRemotDataSource.getPosts(
+        isRells: isRells,
+        existingPostIds: existingPostIds,
+        gender: gender,
+        logs: logs,
+        max: maxAge,
+        min: minAge,
+        topic: topic
+
+
+      );
+          print("imp🈹$topic");
+
       final posts = PostModels.map((model) => model.toEntity()).toList();
       return right(posts);
     } on ServerException catch (e) {

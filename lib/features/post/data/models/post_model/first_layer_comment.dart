@@ -51,4 +51,24 @@ class CommentModel {
   String toString() {
     return 'CommentModel(id: $id, content: $content, user: $user, repliedBy: $repliedBy, repliedTo: $repliedTo, likedBy: $likedBy, createdAt: $createdAt)';
   }
+    CommentModel copyWith({
+    String? id,
+    String? content,
+    UserModel? user,
+    List<String>? repliedBy,
+    String? repliedTo,
+    List<String>? likedBy,
+    DateTime? createdAt,
+  }) {
+    return CommentModel(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      user: user ?? this.user,
+      repliedBy: repliedBy ?? this.repliedBy,
+      repliedTo: repliedTo ?? this.repliedTo,
+      likedBy: likedBy ?? this.likedBy,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
 }

@@ -9,7 +9,27 @@ class GetPosts {
 
   GetPosts(this.repository);
 
-  Future<Either<Failure, List<Post>>> call(bool isRells) {
-    return repository.getPosts(isRells: isRells);
+  Future<Either<Failure, List<Post>>> call({
+    required bool isRells,
+    List<String>? existingPostIds,
+    List<String>? topic,
+
+    Map<String, dynamic>? logs,
+    String? gender,
+    int? maxAge,
+    int? minAge,
+    List<String>? categories,
+  }) {
+        print("🈹$topic");
+
+
+    return repository.getPosts(isRells: isRells,
+    topic: topic,
+    existingPostIds: existingPostIds,
+    
+    gender: gender,
+    logs: logs,
+    maxAge: maxAge,
+    minAge: minAge);
   }
 }

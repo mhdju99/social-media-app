@@ -34,9 +34,9 @@ class TrackerRepository {
     });
     try {
       await api.post(await EndPoints.recommendEndPoint, data: payload);
-      print("✅ Logs sent");
+      print("🈹✅ Logs sent");
     } catch (e) {
-      print("❌ Error sending logs: $e");
+      print("🈹❌ Error sending logs: $e");
     }
   }
 
@@ -62,9 +62,9 @@ class TrackerRepository {
               .toList(),
         }
       });
-      print("✅ feedbCK sent");
+      print("🈹✅ feedbCK sent");
     } catch (e) {
-      print("❌ Error sending logs: $e");
+      print("🈹❌ Error sending logs: $e");
     }
   }
 }
