@@ -52,12 +52,8 @@ class AuthCodeRequestedSuccess extends AuthenticationState {
 }
 
 class AuthCodeVerifiedSuccess extends AuthenticationState {
-  final String token;
-  AuthCodeVerifiedSuccess({
-    required this.token,
-  });
-
-  List<Object> get props => [token];
+ 
+  List<Object> get props => [];
 }
 
 class AuthPasswordResetSuccess extends AuthenticationState {}

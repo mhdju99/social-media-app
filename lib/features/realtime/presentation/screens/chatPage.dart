@@ -35,7 +35,9 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     // _scrollController = ScrollController();
     _fetchStatus();
-
+    // BlocProvider<ChatBloc>(
+    //   create: (_) => sl<ChatBloc>()..add(GetChatEvent(widget.targetUserId)),
+    // );
     context.read<ChatBloc>().add(GetChatEvent(widget.targetUserId));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom1();
@@ -71,7 +73,8 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
   }
-Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
+
+  Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
       const Duration(minutes: 1), (_) => DateTime.now());
 
   final TextEditingController _messageController = TextEditingController();
@@ -116,6 +119,7 @@ Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
+                // bottomRight: Radius.circular(16),
               ),
             ),
             child: Text(message,
@@ -123,10 +127,10 @@ Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
           ),
         ),
         const SizedBox(width: 8),
-        const CircleAvatar(
-          backgroundColor: Colors.teal,
-          child: Icon(Icons.person, color: Colors.white),
-        ),
+        // const CircleAvatar(
+        //   backgroundColor: Colors.teal,
+        //   child: Icon(Icons.person, color: Colors.white),
+        // ),
       ],
     );
   }
@@ -140,19 +144,20 @@ Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.grey[300],
-          child: const Icon(Icons.support_agent, color: Colors.grey),
-        ),
+        // CircleAvatar(
+        //   backgroundColor: Colors.grey[300],
+        //   child: const Icon(Icons.support_agent, color: Colors.grey),
+        // ),
         const SizedBox(width: 8),
         Flexible(
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Colors.grey[300],
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
+                // bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
               ),
             ),
@@ -298,7 +303,7 @@ Stream<DateTime> get _timeStream => Stream<DateTime>.periodic(
                       child: TextField(
                         controller: _messageController,
                         decoration: InputDecoration(
-                          hintText: "Type your message here...",
+                          hintText: "Message",
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
                           border: OutlineInputBorder(

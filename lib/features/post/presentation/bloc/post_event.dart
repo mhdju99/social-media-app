@@ -15,6 +15,7 @@ class GetPostRequested extends PostEvent {
   @override
   List<Object?> get props => [postId];
 }
+
 class GetPostsRequested extends PostEvent {
   final bool isRells;
   List<String>? existingPostIds;
@@ -37,28 +38,36 @@ class GetPostsRequested extends PostEvent {
   @override
   List<Object?> get props => [isRells];
 }
+
 class CreatePostRequested extends PostEvent {
   final String topic;
   final String description;
   final List<File> images;
   final bool reelFlag;
+  final bool hiddenFlag;
 
   const CreatePostRequested({
     required this.topic,
     required this.description,
     required this.images,
     required this.reelFlag,
+    required this.hiddenFlag,
   });
 
   @override
   List<Object?> get props => [topic, description, images, reelFlag];
 }
+
 class DeleteCommentEvent extends PostEvent {
   final String commentId;
 
   const DeleteCommentEvent({required this.commentId});
 }
+class updatepostateEvent extends PostEvent {
+  final String postid;
 
+  const updatepostateEvent({required this.postid});
+}
 class LikeCommentEvent extends PostEvent {
   final String commentId;
 
@@ -75,7 +84,7 @@ class ModifyPostRequested extends PostEvent {
   final String postId;
   final String newDescription;
   final List<File>? newImages;
- final  List<String>? imagesToDelete;
+  final List<String>? imagesToDelete;
 
   const ModifyPostRequested({
     required this.postId,
@@ -106,18 +115,24 @@ class ToggleLikePostRequested extends PostEvent {
   @override
   List<Object?> get props => [postId];
 }
+
 class PostErrorOccurred extends PostEvent {
   final String message;
   const PostErrorOccurred(this.message);
 }
+
 class AddCommentsRequested extends PostEvent {
   final String comments;
   final String? replyto;
   final String postId;
+  final bool? hiddenflag;
 
-  const AddCommentsRequested(this.comments, this.postId,
-  this.replyto);
+  const AddCommentsRequested(
+      {required this.comments,
+      required this.postId,
+      this.replyto,
+      this.hiddenflag});
 
   @override
-  List<Object?> get props => [comments, postId,replyto];
+  List<Object?> get props => [comments, postId, replyto];
 }

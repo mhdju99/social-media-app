@@ -146,8 +146,12 @@ class _ReplyspageState extends State<Replyspage> {
 
                                 // هنا يمكن إضافة حدث إضافة تعليق للبلوك لو كان جاهز
                                 context.read<PostBloc>().add(
-                                    AddCommentsRequested(text, widget.postid,
-                                        widget.mainComment.id));
+                                    AddCommentsRequested(comments:text, postId:  widget.postid,replyto:   widget.mainComment.id,
+                                    
+
+                                      
+                                      
+                                      ));
                                 context.read<TrackerBloc>().add(LogActionEvent(
                                     category: category[widget.topic]!,
                                     action: UserActions.comment));

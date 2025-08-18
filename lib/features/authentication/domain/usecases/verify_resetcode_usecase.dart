@@ -10,7 +10,7 @@ class VerifyResetCodeUseCase {
     required this.authenticationRepository,
   });
 
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, void>> call(
       {required String email, required String code}) {
     debugPrint("aaaaaaaaaaaaaaaaaa ${email}");
 

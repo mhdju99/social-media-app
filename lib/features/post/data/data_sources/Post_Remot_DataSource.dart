@@ -27,6 +27,13 @@ abstract class PostRemotDataSource {
     required bool reelFlag,
     required String describtion,
     required List<File> images,
+          required bool hiddenFlag,
+
+  });
+    Future<void> updatePoststate({
+    required String postid,
+ 
+
   });
   Future<void> modifyPost(
       {required String postId,
@@ -48,6 +55,7 @@ abstract class PostRemotDataSource {
   Future<Map<String, dynamic>> addComment({
     required String postId,
     required String content,
+    bool? hiddenflag,
     String? repliedTo,
   });
   Future<void> likeUnlikeComment({required String commentId});
@@ -72,6 +80,7 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
   Future<Map<String, dynamic>> addComment(
       {required String postId,
       String? repliedTo,
+      bool? hiddenflag,
       required String content}) async {
     final Map<String, dynamic> data = {
       "postId": postId,
@@ -79,6 +88,12 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
     };
 
     if (repliedTo != null) data['repliedTo'] = repliedTo;
+    if (hiddenflag != null) {
+      data['hiddenFlag'] = hiddenflag;
+    } else {
+      data['hiddenFlag'] = false;
+    }
+    print("hiddenflags ${data}");
 
     Response response =
         await api.post(await EndPoints.addCommentEndPoint, data: data);
@@ -93,12 +108,14 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
   Future<void> createPost(
       {required String topic,
       required bool reelFlag,
+      required bool hiddenFlag,
       required String describtion,
       required List<File> images}) async {
     final formData = FormData.fromMap({
       'topic': topic,
       'description': describtion,
       'reelFlag': reelFlag.toString(),
+      'hiddenFlag': hiddenFlag.toString(),
     });
     for (var image in images) {
       formData.files.add(
@@ -169,6 +186,7 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
 
     Map<String, dynamic> resposneData = response.data;
     PostDetailsModel postModel = PostDetailsModel.fromResponse(resposneData);
+    print("}}}${postModel.comments}");
     debugPrint("❤💞");
     debugPrint(postModel.comments.toString());
     return postModel;
@@ -224,17 +242,23 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
     if (gender != null) datamap['gender'] = gender;
     if (min != null) datamap['min'] = min;
     if (max != null) datamap['max'] = max;
-     datamap['postsNumber'] = 3;
-    print("🈹$datamap");
-    print("cat🈹$datamap['categories']");
-    print("data🈹$topic");
+    datamap['postsNumber'] = 3;
+
     final response = await api.post(
       await EndPoints.getPostsEndPoint,
       data: datamap,
     );
-    print("🕳$response");
 
     final data = response.data as List;
     return data.map((json) => PostModel.fromJson(json)).toList();
+  }
+  
+  @override
+  Future<void> updatePoststate({required String postid})async {
+
+    await api.put(
+      await EndPoints.updatehiddenstatusEndPoint,
+      queryParameters: {"postId": postid},
+    );
   }
 }

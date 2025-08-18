@@ -103,6 +103,34 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               Card(
                 elevation: 3,
                 child: ListTile(
+                  leading: const Icon(
+                    Icons.person_off,
+                  ),
+                  title: Text(
+                    post.hiddenFlag ? "Show Publisher" : "Make Post Anonymous",
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                  onTap: () async {
+                    contexta
+                        .read<PostBloc>()
+                        .add(updatepostateEvent(postid: post.id));
+
+                    // تأخير نص ثانية قبل طلب الجلب
+                    await Future.delayed(const Duration(milliseconds: 500));
+
+                    contexta
+                        .read<PostBloc>()
+                        .add(GetPostRequested(widget.postid));
+
+                    Navigator.pop(context, 'refresh');
+                  },
+                ),
+              ),
+              Card(
+                elevation: 3,
+                child: ListTile(
                   leading: const Icon(Icons.delete_outline_rounded,
                       color: Colors.red),
                   title: const Text(
@@ -124,6 +152,69 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     );
   }
 
+  void _showcommwntOptions(
+    BuildContext contexta,
+  ) {
+    showModalBottomSheet(
+      context: contexta,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 3),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded,
+                      color: Colors.red),
+                  title: const Text(
+                    "add anonymous comment",
+                    style: TextStyle(fontSize: 14, color: Colors.red),
+                  ),
+                  onTap: () async {
+                    final text = commentController.text;
+                    if (text.trim().isEmpty) return;
+
+                    setState(() => isSubmitting = true);
+
+                    contexta.read<PostBloc>().add(AddCommentsRequested(
+                        comments: text,
+                        postId: widget.postid,
+                        hiddenflag: true,
+                        replyto: null));
+                    commentController.clear();
+                    await Future.delayed(const Duration(milliseconds: 500));
+
+                    setState(() => isSubmitting = false);
+                    WidgetsBinding.instance
+                        .addPostFrameCallback((_) => _scrollToBottom());
+                    Navigator.pop(
+                      context,
+                    ); // إغلاق الـ BottomSheet
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -131,17 +222,41 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       child: BlocConsumer<PostBloc, PostState>(
           listener: (context, state) {
             if (state is LikeCommentFalier) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  elevation: 4,
-                  content: Text(state.message),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.black87,
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (ctx) => AlertDialog(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12)),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.warning_amber,
+                          size: 40, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
-                  duration: const Duration(seconds: 2),
-                  margin: const EdgeInsets.all(16),
+                  actions: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('OK'),
+                      ),
+                    ),
+                  ],
                 ),
               );
             } else if (state is delDone) {
@@ -197,60 +312,123 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         InkWell(
-                                          onTap: () {
-                                            if (state.post.isMyPost!) {
-                                              final result = Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        const ProfileScreen()),
-                                              );
-                                              return;
-                                            }
-                                            final result = Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      UserProfileScreen(
-                                                          userId: state.post
-                                                              .publisher.id)),
-                                            );
-                                          },
                                           child: Row(
                                             children: [
-                                              CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                  "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                              InkWell(
+                                                onTap: () {
+                                                  if (state.post.hiddenFlag ==
+                                                      true) {
+                                                    return;
+                                                  }
+                                                  if (state.post.isMyPost!) {
+                                                    final result =
+                                                        Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const ProfileScreen()),
+                                                    );
+                                                    return;
+                                                  }
+                                                  final result = Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            UserProfileScreen(
+                                                                userId: state
+                                                                    .post
+                                                                    .publisher
+                                                                    .id)),
+                                                  );
+                                                },
+                                                child: CircleAvatar(
+                                                  backgroundImage: (state.post
+                                                              .hiddenFlag ==
+                                                          false)
+                                                      ? (state
+                                                              .post
+                                                              .publisher
+                                                              .profileImage
+                                                              .isNotEmpty)
+                                                          ? NetworkImage(
+                                                              "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${state.post.publisher.profileImage}",
+                                                            )
+                                                          : const AssetImage(
+                                                              "assets/images/default_avatar.png")
+                                                      : const AssetImage(
+                                                          "assets/images/anonymous-user.png"),
+
+                                                  // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
+                                                  radius: 20,
                                                 ),
-                                                radius: 20,
                                               ),
                                               const SizedBox(width: 12),
                                               Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                      state.post.publisher
-                                                          .userName,
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color:
-                                                              Colors.grey[800])),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      if (state.post
+                                                              .hiddenFlag ==
+                                                          true) {
+                                                        return;
+                                                      }
+                                                      if (state
+                                                          .post.isMyPost!) {
+                                                        final result =
+                                                            Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (_) =>
+                                                                  const ProfileScreen()),
+                                                        );
+                                                        return;
+                                                      }
+                                                      final result =
+                                                          Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                UserProfileScreen(
+                                                                    userId: state
+                                                                        .post
+                                                                        .publisher
+                                                                        .id)),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                        (state.post.hiddenFlag ==
+                                                                true)
+                                                            ? "Anonymous user"
+                                                            : state
+                                                                .post
+                                                                .publisher
+                                                                .userName,
+
+                                                        // widget.post.publisher.userName,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors
+                                                                .grey[800])),
+                                                  ),
                                                   Text(
                                                       formatPostTime(
                                                           state.post.createdAt),
                                                       style: TextStyle(
-                                                          color: Colors.grey[500],
+                                                          color:
+                                                              Colors.grey[500],
                                                           fontSize: 12)),
                                                 ],
                                               ),
                                               const Spacer(),
                                               IconButton(
-                                                icon:
-                                                    const Icon(Icons.more_horiz),
-                                                onPressed: () => _showPostOptions(
-                                                    context, state.post),
+                                                icon: const Icon(
+                                                    Icons.more_horiz),
+                                                onPressed: () =>
+                                                    _showPostOptions(
+                                                        context, state.post),
                                               )
                                             ],
                                           ),
@@ -286,11 +464,12 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                                 Text(
                                                     state.post.comments.isEmpty
                                                         ? ''
-                                                        : state
-                                                            .post.comments.length
+                                                        : state.post.comments
+                                                            .length
                                                             .toString(),
                                                     style: TextStyle(
-                                                        color: Colors.grey[600])),
+                                                        color:
+                                                            Colors.grey[600])),
                                                 const SizedBox(width: 12),
                                               ],
                                             ),
@@ -300,12 +479,12 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                     ),
                                   ),
                                 ),
-                      
+
                                 const SizedBox(height: 10),
                                 // const Text("Comments",
                                 //     style:
                                 //         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      
+
                                 // const SizedBox(height: 10),
                                 ...state.post.comments.map((c) => Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -319,7 +498,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                               ],
                             ),
                           ),
-                      
+
                           // 🔷 Comment Input
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -335,7 +514,6 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(4),
                                     child: CustomTextField(
-                                      prefixIcon: const Icon(Icons.message),
                                       text: "   Add a comment...",
                                       controller: commentController,
                                     ),
@@ -343,6 +521,9 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 IconButton(
+                                  onLongPress: () {
+                                    return _showcommwntOptions(context);
+                                  },
                                   icon: isSubmitting
                                       ? const SizedBox(
                                           width: 20,
@@ -355,23 +536,27 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                                   onPressed: () async {
                                     final text = commentController.text;
                                     if (text.trim().isEmpty) return;
-                      
+
                                     setState(() => isSubmitting = true);
-                      
+
                                     context.read<PostBloc>().add(
                                         AddCommentsRequested(
-                                            text, widget.postid, null));
+                                            comments: text,
+                                            postId: widget.postid,
+                                            replyto: null));
                                     context.read<TrackerBloc>().add(
                                         LogActionEvent(
-                                            category: category[state.post.topic]!,
+                                            category:
+                                                category[state.post.topic]!,
                                             action: UserActions.comment));
                                     commentController.clear();
                                     await Future.delayed(
                                         const Duration(milliseconds: 500));
-                      
+
                                     setState(() => isSubmitting = false);
-                                    WidgetsBinding.instance.addPostFrameCallback(
-                                        (_) => _scrollToBottom());
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback(
+                                            (_) => _scrollToBottom());
                                   },
                                 )
                               ],

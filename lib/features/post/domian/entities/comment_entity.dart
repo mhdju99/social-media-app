@@ -11,6 +11,7 @@ class Comment extends Equatable {
   final List<String>? likedBy;
   final DateTime createdAt;
    final bool isLiked;
+   final bool? hiddenFlag;
    final bool? isMyComment;
      final int likesCount;
 
@@ -26,6 +27,7 @@ class Comment extends Equatable {
     required this.createdAt,
     required this.likesCount,
     this.isLiked=false,
+    this.hiddenFlag,
     this.isMyComment= false,
 
   });
@@ -40,7 +42,8 @@ class Comment extends Equatable {
         createdAt,
         isLiked, // 👈 مفقود سابقًا
         isMyComment, // 👈 مفقود
-        likesCount // 👈 مفقود
+        likesCount,
+        hiddenFlag // 👈 مفقود
       ];
 
       Comment copyWith({
@@ -53,7 +56,8 @@ class Comment extends Equatable {
     DateTime? createdAt,
     bool? isLiked,
         bool? isMyComment,
-           int? likesCount
+           int? likesCount,
+       bool?    hiddenFlag
 
 
   }) {
@@ -67,7 +71,8 @@ class Comment extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       isLiked: isLiked??false,
       isMyComment: isMyComment??this.isMyComment,
-      likesCount: likesCount??this.likesCount
+      likesCount: likesCount??this.likesCount,
+      hiddenFlag: hiddenFlag??this.hiddenFlag,
     );
   }
 

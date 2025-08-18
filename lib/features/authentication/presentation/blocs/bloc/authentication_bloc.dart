@@ -100,20 +100,11 @@ class AuthenticationBloc
   }
   FutureOr<void> _handleResetPassword(
       ResetPasswordRequested event, emit) async {
-    String? token;
-    debugPrint("ssssssssss$state");
-    if (state is AuthCodeVerifiedSuccess) {
-      token = (state as AuthCodeVerifiedSuccess).token;
-    }
-
-    if (token == null) {
-      emit(const AuthFailure("no token"));
-      return;
-    }
+   
 
     emit(AuthLoading());
     final result = await resetPasswordUseCase(
-        newPassword: event.newPassword, token: resetToken);
+        newPassword: event.newPassword);
     result.fold(
       (failure) => emit(AuthFailure(failure.errMessage)),
       (_) => emit(AuthPasswordResetSuccess()),
@@ -122,25 +113,14 @@ class AuthenticationBloc
 
   FutureOr<void> _handleVerifyResetCode(
       VerifyResetCodeRequested event, emit) async {
-    // String? email;
-    // debugPrint("ssssssssss$state");
-    // if (state is AuthCodeRequestedSuccess) {
-    //   email = (state as AuthCodeRequestedSuccess).email;
-    // }
-
-    // if (email == null) {
-    //   emit(const AuthFailure("badddd email"));
-    //   return;
-    // }
-
     emit(AuthLoading());
 
     final result = await verifyResetCodeUseCase(
-        code: event.code, email: 'hhhhhmod0@gmail.com');
+        code: event.code, email: event.email);
     result.fold(
       (failure) => emit(AuthFailure(failure.errMessage)),
-      (token) {
-        return emit(AuthCodeVerifiedSuccess(token: token));
+      (_) {
+        return emit(AuthCodeVerifiedSuccess());
       },
     );
   }

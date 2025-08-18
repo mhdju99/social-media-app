@@ -136,19 +136,19 @@ class _HomepageState extends State<Homepage>
           return sl<PostBloc>()
             ..add(GetPostsRequested(isRells: false, logs: logs));
         },
-        child:  BlocListener<ChatBloc, ChatState>(
+        child: BlocListener<ChatBloc, ChatState>(
           listener: (context, state) {
             if (state is ChatMessageReceived) {
-            //                print("💫${state.message}");
-            // NotificationService.showNotification(
-            //   title: 'message received a',
-            //   body: state.message["content"],
+              //                print("💫${state.message}");
+              // NotificationService.showNotification(
+              //   title: 'message received a',
+              //   body: state.message["content"],
 
-            // );
-            // context
-            //     .read<NotificationBloc>()
-            //     .add(AddNotificationEvent({"from": "", "to": "", "text": "Message Received < ${state.message["content"]} >", "createdAt": DateTime.now() }));
-            } 
+              // );
+              // context
+              //     .read<NotificationBloc>()
+              //     .add(AddNotificationEvent({"from": "", "to": "", "text": "Message Received < ${state.message["content"]} >", "createdAt": DateTime.now() }));
+            }
           },
           child: Scaffold(
             backgroundColor: Colors.grey[200],
@@ -466,7 +466,24 @@ class _HomepageState extends State<Homepage>
         } else if (state is PostsLoaded) {
           List<Post> posts;
           List<String> postIds = state.posts.map((post) => post.id).toList();
-
+          if (state.posts.length < 1) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(" no posts"),
+                  IconButton(
+                    onPressed: () {
+                      context.read<PostBloc>().add(GetPostsRequested(
+                            isRells: false,
+                          ));
+                    },
+                    icon: const Icon(Icons.refresh),
+                  )
+                ],
+              ),
+            );
+          }
           if (isFollowing) {
             posts = state.posts
                 .where(

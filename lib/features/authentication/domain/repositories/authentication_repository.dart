@@ -32,10 +32,10 @@ abstract class AuthenticationRepository {
   Future<Map<String, dynamic>> isUserLogIn();
   Future<String?> fetchCachedUserId();
   Future<Either<Failure, void>> requestResetCode({required String email});
-  Future<Either<Failure, String>> verifyResetCode(
+  Future<Either<Failure, void>> verifyResetCode(
       {required String email, required String code});
   Future<Either<Failure, void>> resetPassword(
-      {required String newPassword, required String token});
+      {required String newPassword});
   Future<Either<Failure, void>> addProfailImage({required File file});
   Future<Either<Failure, void>> ChosePreferredTopics({
     required String topic,

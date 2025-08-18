@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:social_media_app/features/post/data/models/post_model/user.dart';
 import 'package:social_media_app/features/post/domian/entities/post_entity.dart';
+import 'package:social_media_app/features/post/domian/usecases/updatePostState.dart';
 import 'package:social_media_app/features/profile/domain/usecases/GetUserProfileUsecase.dart';
 import 'package:test/test.dart';
 
@@ -42,6 +43,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   ModifyPost modifyPost;
   GetPosts getPosts;
   GetUserProfileUsecase getUserProfileUsecase;
+  Updatepoststate updatepoststate;
   PostBloc({
     required this.getPostDetails,
     required this.getUserProfileUsecase,
@@ -55,6 +57,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     required this.deletePost,
     required this.modifyPost,
     required this.getPosts,
+    required this.updatepoststate,
   }) : super(PostInitial()) {
     // on<CreatePostRequested>(_handleCreatePost);
     on<ModifyPostRequested>((ModifyPostRequested event, emit) async {
@@ -121,7 +124,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           maxAge: event.maxAge,
           minAge: event.minAge);
 
-
       result.fold(
         (l) {
           emit(PostError(l.errMessage));
@@ -147,6 +149,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostLoading());
 
       final result = await createPost(
+        hiddenFlag: event.hiddenFlag,
           topic: event.topic,
           describtion: event.description,
           images: event.images,
@@ -252,6 +255,20 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         },
       );
     });
+        on<updatepostateEvent>((event, emit) async {
+      final result = await updatepoststate(event.postid);
+
+      result.fold(
+        (failure) {
+          // emit(LikeCommentFalier(failure.errMessage));
+          debugPrint("❤ssssss");
+          debugPrint(failure.errMessage);
+        },
+        (_) {
+          // emit(delDone());
+        },
+      );
+    });
     on<LikeCommentEvent>((event, emit) async {
       final result = await likeUnlikeCommentUseCase(event.commentId);
 
@@ -338,6 +355,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final result = await addComment(
           content: event.comments,
           postId: event.postId,
+          hiddenflag: event.hiddenflag,
           repliedTo: event.replyto);
 
       if (state is PostdetailsLoaded) {
@@ -359,6 +377,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             final updatedComments = List<Comment>.from(post.comments)
               ..add(Comment(
                   likesCount: 0,
+                  hiddenFlag: false,
                   id: comment["comment"],
                   content: event.comments,
                   user: userModel
@@ -383,10 +402,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             // emit(currentState.copyWith(errorMessage: null));
           },
           (comment) {
-                        UserModel userModel = comment["user"]; // تحويل إلى كائن UserModel
+            UserModel userModel = comment["user"]; // تحويل إلى كائن UserModel
 
             final updatedComments = List<Comment>.from(post!)
-           ..add(Comment(
+              ..add(Comment(
                   likesCount: 0,
                   id: comment["comment"],
                   content: event.comments,
@@ -394,7 +413,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
                       .toEntity(), // ثم استدعاء toEntity() لتحويله إلى كائن User
                   repliedBy: [],
                   likedBy: [],
-                  createdAt: DateTime.now())) ;
+                  createdAt: DateTime.now()));
             emit(currentState.copyWith(replies: updatedComments));
           },
         );

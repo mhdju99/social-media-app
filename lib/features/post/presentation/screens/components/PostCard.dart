@@ -115,7 +115,20 @@ class _PostCardState extends State<PostCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
-                    onTap: () {
+                   
+                    child: Row(
+                      children: [
+                        // CircleAvatar(
+                        //   backgroundImage: NetworkImage(
+                        //     "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.post.publisher.profileImage}",
+                        //   ),
+                        //   radius: 20,
+                        // ),
+                        InkWell(
+                           onTap: () {
+                      if (widget.post.hiddenFlag == true) {
+                        return;
+                      }
                       if (widget.post.isMyPost != null) {
                         if (widget.post.isMyPost!) {
                           final result = Navigator.push(
@@ -133,13 +146,20 @@ class _PostCardState extends State<PostCard> {
                                 userId: widget.post.publisher.id)),
                       );
                     },
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.post.publisher.profileImage}",
+                          child: CircleAvatar(
+                            backgroundImage: (widget.post.hiddenFlag == false)
+                                ? (widget.post.publisher.profileImage.isNotEmpty)
+                                    ? NetworkImage(
+                                        "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.post.publisher.profileImage}",
+                                      )
+                                    : const AssetImage(
+                                        "assets/images/default_avatar.png")
+                                : const AssetImage(
+                                    "assets/images/anonymous-user.png"),
+                          
+                            // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
+                            radius: 20,
                           ),
-                          radius: 20,
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -147,10 +167,38 @@ class _PostCardState extends State<PostCard> {
                           children: [
                             Row(
                               children: [
-                                Text(widget.post.publisher.userName,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey[800])),
+                                InkWell(
+                                   onTap: () {
+                      if (widget.post.hiddenFlag == true) {
+                        return;
+                      }
+                      if (widget.post.isMyPost != null) {
+                        if (widget.post.isMyPost!) {
+                          final result = Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ProfileScreen()),
+                          );
+                          return;
+                        }
+                      }
+                      final result = Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => UserProfileScreen(
+                                userId: widget.post.publisher.id)),
+                      );
+                    },
+                                  child: Text(
+                                      (widget.post.hiddenFlag == true)
+                                          ? "Anonymous user"
+                                          : widget.post.publisher.userName,
+                                  
+                                      // widget.post.publisher.userName,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[800])),
+                                ),
                                 // const Icon(
                                 //   Icons.verified,
                                 //   color: Colors.blue,

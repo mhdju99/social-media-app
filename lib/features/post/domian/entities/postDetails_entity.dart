@@ -12,6 +12,7 @@ class PostDetails extends Equatable {
  final  bool? isMyPost;
   final int likesCount;
   final bool reelFlag;
+  final bool hiddenFlag;
   final User publisher;
   final List<Comment> comments;
   final DateTime createdAt;
@@ -25,6 +26,7 @@ class PostDetails extends Equatable {
     required this.isLiked,
     required this.likesCount,
     required this.reelFlag,
+    required this.hiddenFlag,
     required this.publisher,
     required this.comments,
     required this.createdAt,
@@ -71,7 +73,8 @@ class PostDetails extends Equatable {
       publisher: publisher ?? this.publisher,
       comments: comments ?? this.comments,
       createdAt: createdAt ?? this.createdAt,
-      isMyPost: isMyPost
+      isMyPost: isMyPost,
+      hiddenFlag: hiddenFlag
     );
   }
 

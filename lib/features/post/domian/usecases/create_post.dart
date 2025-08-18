@@ -13,9 +13,13 @@ class CreatePost {
     required bool reelFlag,
     required String describtion,
     required List<File> images,
+                required bool hiddenFlag,
+
   }) {
     return repository.createPost(
       topic: topic,
+                hiddenFlag: hiddenFlag,
+
       reelFlag: reelFlag,
       describtion: describtion,
       images: images,

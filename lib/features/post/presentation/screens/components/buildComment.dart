@@ -28,6 +28,8 @@ class _buildCommentState extends State<buildComment> {
   @override
   Widget build(BuildContext context) {
     final comment = widget.comment;
+        print("XZX${comment.hiddenFlag}");
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -39,11 +41,14 @@ class _buildCommentState extends State<buildComment> {
               Column(
                 children: [
                   CircleAvatar(
-                    backgroundImage: (comment.user.profileImage.isNotEmpty)
+                    backgroundImage:
+                    (comment.hiddenFlag==false)?    (comment.user.profileImage.isNotEmpty)
                         ? NetworkImage(
                             "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${comment.user.profileImage}",
                           )
-                        : const AssetImage("assets/images/default_avatar.png"),
+                        : const AssetImage("assets/images/default_avatar.png"):const AssetImage("assets/images/anonymous-user.png"),
+                 
+                    // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
                     radius: 20,
                   ),
                   Visibility(
@@ -84,8 +89,8 @@ class _buildCommentState extends State<buildComment> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  comment.user.userName,
+                                Text((comment.hiddenFlag==true)?"Anonymous user"
+                                  :comment.user.userName,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),

@@ -84,12 +84,41 @@ class _CreatePostPageState extends State<CreatePostPage> {
             );
             Navigator.pop(context);
           } else if (state is PostError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 2),
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (ctx) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.warning_amber,
+                        size: 40, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                actions: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -97,164 +126,231 @@ class _CreatePostPageState extends State<CreatePostPage> {
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Create Post'),
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.grey.shade300,
           ),
           body: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: ListView(
-              children: [
-                // Post Type Switch
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: ['Post ', 'Reels'].map((type) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ChoiceChip(
-                        showCheckmark: false,
-                        label: Text(type),
-                        selected: _postType == type,
-                        onSelected: (_) {
-                          setState(() {
-                            _postType = type;
-                            _mediaFiles
-                                .clear(); // clear media when type changes
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-
-                // Description
-                TextField(
-                  controller: _postController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: 'Write something...',
-                    border: OutlineInputBorder(
-                        // borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(15)),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Topic Selector
-                const Text('Select Post Topic:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  children: _topics.map((topic) {
-                    return ChoiceChip(
-                      showCheckmark: false,
-                      label: Text(topic),
-                      selected: _selectedTopic == topic,
-                      selectedColor: Colors.blue.shade100,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedTopic = topic;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20),
-
-                // Media Preview
-                Text(
-                  _postType == 'Reels' ? 'Attached Video:' : 'Attached Images:',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                _mediaFiles.isEmpty
-                    ? const Text('No media added yet.')
-                    : SizedBox(
-                        height: 120,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _mediaFiles.length,
-                          itemBuilder: (context, index) {
-                            return Stack(
-                              alignment: Alignment.topRight,
-                              children: [
-                                Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: _postType == 'Reels'
-                                        ? const Icon(Icons.videocam, size: 100)
-                                        : Image.file(
-                                            _mediaFiles[index],
-                                            width: 100,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 2,
-                                  right: 2,
-                                  child: GestureDetector(
-                                    onTap: () => _removeMedia(index),
-                                    child: const CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: Colors.red,
-                                      child: Icon(Icons.close,
-                                          size: 14, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              child: ListView(
+                children: [
+                  // Post Type Switch
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: ['Post ', 'Reels'].map((type) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: ChoiceChip(
+                          showCheckmark: false,
+                          label: Text(type),
+                          selected: _postType == type,
+                          onSelected: (_) {
+                            setState(() {
+                              _postType = type;
+                              _mediaFiles
+                                  .clear(); // clear media when type changes
+                            });
                           },
                         ),
-                      ),
-                const SizedBox(height: 16),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
 
-                // Add Media Button
-                ElevatedButton.icon(
-                  onPressed: _postType == 'Post' && _mediaFiles.length >= 4
-                      ? null
-                      : _pickMedia,
-                  icon: Icon(
-                      _postType == 'Reels' ? Icons.video_library : Icons.image),
-                  label: Text(_postType == 'Reels' ? 'Add Video' : 'Add Image'),
-                ),
-                const SizedBox(height: 16),
+                  // Description
+                  TextField(
+                    controller: _postController,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'Write something...',
+                      border: OutlineInputBorder(
+                          // borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(15)),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-                // Submit Button
-                BlocBuilder<PostBloc, PostState>(
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        if (_selectedTopic.isNotEmpty &&
-                            _postController.text.isNotEmpty &&
-                            _mediaFiles.isNotEmpty) {
-                          context.read<PostBloc>().add(
-                                CreatePostRequested(
-                                  topic: _selectedTopic,
-                                  description: _postController.text,
-                                  images: _mediaFiles,
-                                  reelFlag: _postType == 'Reels',
-                                ),
+                  // Topic Selector
+                  const Text('Select Post Topic:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6.0,
+                    children: _topics.map((topic) {
+                      return ChoiceChip(
+                        showCheckmark: false,
+                        label: Text(topic),
+                        selected: _selectedTopic == topic,
+                        selectedColor: Colors.blue.shade100,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedTopic = topic;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  if (_mediaFiles.isNotEmpty)
+                    Column(
+                      children: [
+                        // Text(
+                        //   _postType == 'Reels'
+                        //       ? 'Attached Video:'
+                        //       : 'Attached Images:',
+                        //   style: const TextStyle(fontWeight: FontWeight.bold),
+                        // ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 120,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _mediaFiles.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: _postType == 'Reels'
+                                          ? const Icon(Icons.videocam,
+                                              size: 100)
+                                          : Image.file(
+                                              _mediaFiles[index],
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 2,
+                                    right: 2,
+                                    child: GestureDetector(
+                                      onTap: () => _removeMedia(index),
+                                      child: const CircleAvatar(
+                                        radius: 12,
+                                        backgroundColor: Colors.red,
+                                        child: Icon(Icons.close,
+                                            size: 14, color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               );
-                        } else {
-                          return;
-                        }
-                      },
-                      child: state is PostLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text('Post'),
-                    );
-                  },
-                ),
-              ],
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 10),
+
+                  // Add Media Button
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal.shade400,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: _postType == 'Post' && _mediaFiles.length >= 4
+                        ? null
+                        : _pickMedia,
+                    icon: Icon(_postType == 'Reels'
+                        ? Icons.video_library
+                        : Icons.image),
+                    label:
+                        Text(_postType == 'Reels' ? 'Add Video' : 'Add Image'),
+                  ),
+                  const SizedBox(height: 5),
+
+                  // Submit Button
+                  BlocBuilder<PostBloc, PostState>(
+                    builder: (context, state) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onPressed: () {
+                                if (_selectedTopic.isNotEmpty &&
+                                    _postController.text.isNotEmpty &&
+                                    _mediaFiles.isNotEmpty) {
+                                  context.read<PostBloc>().add(
+                                        CreatePostRequested(
+                                          hiddenFlag: false,
+                                          topic: _selectedTopic,
+                                          description: _postController.text,
+                                          images: _mediaFiles,
+                                          reelFlag: _postType == 'Reels',
+                                        ),
+                                      );
+                                } else {
+                                  return;
+                                }
+                              },
+                              child: state is PostLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : const Text('Normal Post'),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal.shade800,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onPressed: () {
+                                if (_selectedTopic.isNotEmpty &&
+                                    _postController.text.isNotEmpty &&
+                                    _mediaFiles.isNotEmpty) {
+                                  context.read<PostBloc>().add(
+                                        CreatePostRequested(
+                                                                                    hiddenFlag: true,
+
+                                          topic: _selectedTopic,
+                                          description: _postController.text,
+                                          images: _mediaFiles,
+                                          reelFlag: _postType == 'Reels',
+                                        ),
+                                      );
+                                } else {
+                                  return;
+                                }
+                              },
+                              child: state is PostLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : const Text('anonymous post'),
+                            ),
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

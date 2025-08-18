@@ -17,6 +17,10 @@ abstract class PostRepository {
     required bool reelFlag,
     required String describtion,
     required List<File> images,
+    required bool hiddenFlag,
+  });
+  Future<Either<Failure, void>> updatePoststate({
+    required String postid,
   });
   Future<Either<Failure, void>> modifyPost({
     required String postId,
@@ -25,12 +29,11 @@ abstract class PostRepository {
     List<String>? deleteImagesIds,
   });
   Future<Either<Failure, void>> deletePost({required String postId});
-    Future<Either<Failure, PostDetails>> getPostDetails({required String postId});
+  Future<Either<Failure, PostDetails>> getPostDetails({required String postId});
   Future<Either<Failure, List<Post>>> getPosts({
     required bool isRells,
     List<String>? existingPostIds,
-        List<String>? topic,
-
+    List<String>? topic,
     Map<String, dynamic>? logs,
     String? gender,
     int? maxAge,
@@ -39,14 +42,13 @@ abstract class PostRepository {
 
   Future<Either<Failure, void>> likeUnlikePost({required String postId});
   Future<Either<Failure, Map<String, dynamic>>> addComment({
-        String? repliedTo,
-
+    String? repliedTo,
     required String postId,
     required String content,
+    bool? hiddenflag,
   });
   Future<Either<Failure, void>> likeUnlikeComment({required String commentId});
   Future<Either<Failure, void>> deleteComment({required String commentId});
   Future<Either<Failure, List<Comment>>> getReplies(
       {required List<String> commentIds});
-
 }

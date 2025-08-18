@@ -36,7 +36,7 @@ abstract class AuthenticationRemotDataSource {
   Future<String> verifyResetCode({required String email, required String code});
   Future<void> addProfileImage({required File file});
   Future<void> resetPassword(
-      {required String token, required String newPassword});
+      { required String newPassword});
   Future<void> resetEmail({required String newemail});
 
   Future<void> ChosePreferredTopics({required String Topic});
@@ -136,18 +136,21 @@ class AuthenticationRemotDataSourceImpl
       await EndPoints.requestResetCodeEndPoint,
       queryParameters: {"email": email},
     );
+    
+
+
+
   }
 
   @override
   Future<void> resetPassword(
-      {required String token, required String newPassword}) async {
-    await api.get(
-      await EndPoints.requestResetCodeEndPoint,
-      queryParameters: {"password": newPassword},
-      header: {
-        "token": token,
-      },
+      { required String newPassword}) async {
+ await api.put(
+      await EndPoints.changePasswordEndPoint,
+      data: {"newPassword": newPassword},
+     
     );
+    // print("💤$res");
   }
 
   @override
@@ -190,11 +193,18 @@ class AuthenticationRemotDataSourceImpl
       header: {
         "code": code,
       },
+
     );
-    final token = resposne.headers.value('token');
+        print("💌$resposne");
+
+    final token = resposne.headers.value('Authorization');
+            print("🉑🉑$token");
+
     if (token == null) {
       throw Exception('Authorization token not found in response headers');
     }
+        await local.saveTokenSec(token);
+
     return token;
   }
 

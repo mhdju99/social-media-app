@@ -9,8 +9,8 @@ class ResetpasswordUsecase {
     required this.authenticationRepository,
   });
   Future<Either<Failure, void>> call(
-      {required String newPassword, required String token}) {
+      {required String newPassword, }) {
     return authenticationRepository.resetPassword(
-        newPassword: newPassword, token: token);
+        newPassword: newPassword,);
   }
 }

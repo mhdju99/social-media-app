@@ -18,12 +18,15 @@ class PostRepositoryImpl implements PostRepository {
     required String postId,
     required String content,
     String? repliedTo,
+          bool? hiddenflag,
+
   }) async {
     try {
       Map<String, dynamic> result = await postRemotDataSource.addComment(
         postId: postId,
         content: content,
         repliedTo: repliedTo,
+        hiddenflag: hiddenflag
       );
       // await local.saveToken(user.)
       print("💘${{"comment": result["comment"], "user": result["user"]}}");
@@ -60,6 +63,21 @@ class PostRepositoryImpl implements PostRepository {
       return left(Failure(errMessage: a.toString()));
     }
   }
+  @override
+  Future<Either<Failure, void>>  updatePoststate({
+    required String postid,
+ 
+
+  }) async {
+    try {
+      await postRemotDataSource.updatePoststate(postid: postid);
+      return right(null);
+    } on ServerException catch (e) {
+      return left(Failure(errMessage: e.errorModel.errorMessage));
+    } catch (a) {
+      return left(Failure(errMessage: a.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, List<Comment>>> getReplies(
@@ -81,9 +99,12 @@ class PostRepositoryImpl implements PostRepository {
       {required String topic,
       required bool reelFlag,
       required String describtion,
+            required bool hiddenFlag,
+
       required List<File> images}) async {
     try {
       await postRemotDataSource.createPost(
+        hiddenFlag: hiddenFlag,
           topic: topic,
           reelFlag: reelFlag,
           describtion: describtion,

@@ -53,12 +53,14 @@ class RequstResetCodeRequested extends AuthenticationEvent {
 
 class VerifyResetCodeRequested extends AuthenticationEvent {
   String code;
+  String email;
   VerifyResetCodeRequested({
     required this.code,
+    required this.email,
   });
 
   @override
-  List<Object> get props => [code];
+  List<Object> get props => [code,email];
 }
 
 class ChosePreferredTopicsRequested extends AuthenticationEvent {

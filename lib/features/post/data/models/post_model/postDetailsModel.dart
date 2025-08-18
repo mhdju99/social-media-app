@@ -13,6 +13,8 @@ class PostDetailsModel {
   final List<String> likes;
   final int likesCount;
   final bool reelFlag;
+    final bool hiddenFlag;
+
   final UserModel publisher;
   final List<CommentModel> comments;
   final DateTime createdAt;
@@ -25,6 +27,7 @@ class PostDetailsModel {
     required this.likes,
     required this.likesCount,
     required this.reelFlag,
+    required this.hiddenFlag,
     required this.publisher,
     required this.comments,
     required this.createdAt,
@@ -41,6 +44,7 @@ class PostDetailsModel {
       likes: List<String>.from(json['likes']),
       likesCount: (json['likes'] as List).length,
       reelFlag: json['reelFlag'] ?? false,
+      hiddenFlag: json['hiddenFlag'] ?? false,
       publisher:json['publisher'] is Map<String, dynamic>? UserModel.fromJson(json['publisher']):UserModel(id: "", userName: "", profileImage: ""),
       comments: (json['firstLayerComments'] as List)
           .map((e) => CommentModel.fromJson(e))
@@ -51,6 +55,7 @@ class PostDetailsModel {
 
   PostDetails toEntity() {
     return PostDetails(
+      hiddenFlag: hiddenFlag,
       id: id,
       topic: topic,
       description: description,

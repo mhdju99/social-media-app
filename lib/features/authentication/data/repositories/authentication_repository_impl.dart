@@ -94,14 +94,16 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
   @override
   Future<Either<Failure, void>> resetPassword(
-      {required String newPassword, required String token}) async {
+      {required String newPassword}) async {
     try {
-      await remot.resetPassword(newPassword: newPassword, token: token);
+      await remot.resetPassword(newPassword: newPassword);
+          await local.delTokenSec();
+
       return right(null);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
-      return left(Failure(errMessage: "somthing wrong"));
+      return left(Failure(errMessage:a.toString()));
     }
   }
 @override
@@ -125,22 +127,22 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on ServerException catch (e) {
       return right(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
-      return left(Failure(errMessage: "somthing wrong"));
+      return left(Failure(errMessage: a.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, String>> verifyResetCode(
+  Future<Either<Failure, void>> verifyResetCode(
       {required String email, required String code}) async {
     try {
       debugPrint("aaaaaaaaaaaaaaaaaa ${email}");
 
       final token = await remot.verifyResetCode(code: code, email: email);
-      return right(token);
+      return right(null);
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
-      return left(Failure(errMessage: "somthing wrong"));
+      return left(Failure(errMessage: a.toString()));
     }
   }
 
@@ -152,7 +154,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on ServerException catch (e) {
       return left(Failure(errMessage: e.errorModel.errorMessage));
     } catch (a) {
-      return left(Failure(errMessage: "somthing wrong"));
+      return left(Failure(errMessage: a.toString()));
     }
   }
   

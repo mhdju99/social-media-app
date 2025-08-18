@@ -33,6 +33,7 @@ class EndPoints {
   static String get getRepliesEndPoint => '$baseUrl/comments/get-replies';
 
   static String get getPostEndPoint => '$baseUrl/posts/get-post';
+  static String get updatehiddenstatusEndPoint => '$baseUrl/posts/update-hidden-status';
   static String get getPostsEndPoint => '$baseUrl/posts/get-posts';
   static String get createPostEndPoint => '$baseUrl/posts/create-post';
   static String get deletePostEndPoint => '$baseUrl/posts/delete-post';

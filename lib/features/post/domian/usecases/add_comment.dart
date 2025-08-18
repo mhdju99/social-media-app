@@ -11,10 +11,13 @@ class AddComment {
     required String postId,
     required String content,
       String? repliedTo,
+            bool? hiddenflag,
+
 
   }) {
     return repository.addComment(postId: postId, content: content,
     repliedTo: repliedTo,
+    hiddenflag: hiddenflag
 );
   }
 }

@@ -9,6 +9,7 @@ import 'package:social_media_app/features/authentication/presentation/blocs/bloc
 import 'package:social_media_app/features/authentication/presentation/screens/UploadProfileImagePage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomButton.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/components/CustomTextField.dart';
+import 'package:social_media_app/features/authentication/presentation/screens/resetPassword.dart/inputEmail.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/signUpPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/testPage.dart';
 import 'package:social_media_app/features/authentication/presentation/screens/widgets/buttonText.dart';
@@ -37,15 +38,14 @@ class _LogInState extends State<LogIn> {
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (contexts, state) {
             if (state is AuthSuccess) {
-                // context
-                //   .read<ChatBloc>()
-                //   .add(ConnectToSocketEvent(response.token));
-                context.read<ChatBloc>().add(ConnectToSocketEvent());
+              // context
+              //   .read<ChatBloc>()
+              //   .add(ConnectToSocketEvent(response.token));
+              context.read<ChatBloc>().add(ConnectToSocketEvent());
 
               Navigator.pushReplacement(
                 contexts,
-                MaterialPageRoute(
-                    builder: (contexts) => MainPage()),
+                MaterialPageRoute(builder: (contexts) => MainPage()),
               );
             } else if (state is AuthFailure) {
               SnackbarHelper.show(context,
@@ -120,8 +120,11 @@ class _LogInState extends State<LogIn> {
                           ),
                           InkWell(
                             onTap: () {
-                              // Get.to(Inputemail());
-                              // authControlar.isOriginalContent = false.obs;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Inputemail()),
+                              );
                             },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.end,
