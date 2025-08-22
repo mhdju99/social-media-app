@@ -128,7 +128,7 @@ class _MainPageState extends State<MainPage> {
               unselectedItemColor: Colors.grey.shade600,
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-                BottomNavigationBarItem(icon: Icon(Icons.explore), label: ""),
+                BottomNavigationBarItem(icon: Icon(Icons.video_library), label: ""),
                 BottomNavigationBarItem(icon: Icon(Icons.chat), label: ""),
                 BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
               ],

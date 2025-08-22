@@ -115,7 +115,6 @@ class _PostCardState extends State<PostCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
-                   
                     child: Row(
                       children: [
                         // CircleAvatar(
@@ -125,30 +124,31 @@ class _PostCardState extends State<PostCard> {
                         //   radius: 20,
                         // ),
                         InkWell(
-                           onTap: () {
-                      if (widget.post.hiddenFlag == true) {
-                        return;
-                      }
-                      if (widget.post.isMyPost != null) {
-                        if (widget.post.isMyPost!) {
-                          final result = Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProfileScreen()),
-                          );
-                          return;
-                        }
-                      }
-                      final result = Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => UserProfileScreen(
-                                userId: widget.post.publisher.id)),
-                      );
-                    },
+                          onTap: () {
+                            if (widget.post.hiddenFlag == true) {
+                              return;
+                            }
+                            if (widget.post.isMyPost != null) {
+                              if (widget.post.isMyPost!) {
+                                final result = Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const ProfileScreen()),
+                                );
+                                return;
+                              }
+                            }
+                            final result = Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => UserProfileScreen(
+                                      userId: widget.post.publisher.id)),
+                            );
+                          },
                           child: CircleAvatar(
                             backgroundImage: (widget.post.hiddenFlag == false)
-                                ? (widget.post.publisher.profileImage.isNotEmpty)
+                                ? (widget
+                                        .post.publisher.profileImage.isNotEmpty)
                                     ? NetworkImage(
                                         "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${widget.post.publisher.profileImage}",
                                       )
@@ -156,7 +156,7 @@ class _PostCardState extends State<PostCard> {
                                         "assets/images/default_avatar.png")
                                 : const AssetImage(
                                     "assets/images/anonymous-user.png"),
-                          
+
                             // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
                             radius: 20,
                           ),
@@ -168,32 +168,34 @@ class _PostCardState extends State<PostCard> {
                             Row(
                               children: [
                                 InkWell(
-                                   onTap: () {
-                      if (widget.post.hiddenFlag == true) {
-                        return;
-                      }
-                      if (widget.post.isMyPost != null) {
-                        if (widget.post.isMyPost!) {
-                          final result = Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProfileScreen()),
-                          );
-                          return;
-                        }
-                      }
-                      final result = Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => UserProfileScreen(
-                                userId: widget.post.publisher.id)),
-                      );
-                    },
+                                  onTap: () {
+                                    if (widget.post.hiddenFlag == true) {
+                                      return;
+                                    }
+                                    if (widget.post.isMyPost != null) {
+                                      if (widget.post.isMyPost!) {
+                                        final result = Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const ProfileScreen()),
+                                        );
+                                        return;
+                                      }
+                                    }
+                                    final result = Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => UserProfileScreen(
+                                              userId:
+                                                  widget.post.publisher.id)),
+                                    );
+                                  },
                                   child: Text(
                                       (widget.post.hiddenFlag == true)
                                           ? "Anonymous user"
                                           : widget.post.publisher.userName,
-                                  
+
                                       // widget.post.publisher.userName,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -226,6 +228,7 @@ class _PostCardState extends State<PostCard> {
                     child: Container(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 12),
                           Text(widget.post.description,

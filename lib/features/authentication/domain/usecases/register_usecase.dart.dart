@@ -18,6 +18,7 @@ class RegisterUseCase {
       lastName: params.lastName,
       birthDate: params.birthDate,
       email: params.email,
+      bio: params.bio,
       password: params.password,
       country: params.country,
       city: params.city,

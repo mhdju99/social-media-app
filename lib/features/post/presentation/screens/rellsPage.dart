@@ -231,17 +231,60 @@ class PostCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  children: [
-                    LikeButtonWithCount(postId: post.id),
-                    const SizedBox(width: 12),
-                    Icon(Icons.chat_bubble_outline,
-                        size: 18, color: Colors.grey[500]),
-                    const SizedBox(width: 4),
-                    Text(post.comments.length.toString(),
-                        style: TextStyle(color: Colors.grey[600])),
-                    const SizedBox(width: 12),
-                  ],
-                ),
+                        children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  context.read<PostBloc>().add(
+                                      ToggleLikePostRequested(post.id));
+                                  if (post.isLiked) {
+                                  }
+                                },
+                                child: Icon(
+                                  post.isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  size: 22,
+                                  color: post.isLiked
+                                      ? Colors.red
+                                      : Colors.grey[500],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                post.likesCount == 0
+                                    ? ''
+                                    : post.likesCount.toString(),
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12),
+                          InkWell(
+                            onTap: () {
+                              final result = Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => PostDetailsPage(
+                                        postid:post.id)),
+                              );
+                            },
+                            child: Icon(Icons.chat_bubble_outline,
+                                size: 20, color: Colors.grey[500]),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                             post.comments.isEmpty
+                                  ? ''
+                                  : post.comments.length.toString(),
+                              style: TextStyle(color: Colors.grey[600])),
+                          const SizedBox(width: 12),
+                        ],
+                      ),
               ],
             )
           ],

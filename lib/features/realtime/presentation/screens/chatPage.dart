@@ -5,6 +5,7 @@ import 'package:social_media_app/core/errors/failure.dart';
 import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/authentication/domain/entities/user_entity/user_entity.dart';
 import 'package:social_media_app/features/profile/domain/entities/user_entity.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_user_online_status_usecase.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
 import 'package:social_media_app/features/realtime/presentation/blocs/chat_event.dart';
@@ -208,12 +209,15 @@ class _ChatPageState extends State<ChatPage> {
                 }
               });
             } else if (state is UserBecameOnlineState) {
+              print("💕${widget.targetUserId} on;ine");
               if (state.userId == widget.targetUserId) {
                 setState(() {
                   isOnline = true;
                 });
               }
             } else if (state is UserBecameOfflineState) {
+                            print("💕${widget.targetUserId} offlinne");
+
               if (state.userId == widget.targetUserId) {
                 setState(() {
                   lastSeenAt = DateTime.now().toIso8601String();
@@ -244,10 +248,19 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     Column(
                       children: [
-                        Text(
-                            "${capitalize(widget.user.firstName)} ${capitalize(widget.user.lastName)}",
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
+                        InkWell(
+                          onTap: (){
+                                  Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => UserProfileScreen(userId: widget.targetUserId)),
+                        );
+                          },
+                          child: Text(
+                              "${capitalize(widget.user.firstName)} ${capitalize(widget.user.lastName)}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14)),
+                        ),
                         if (isOnline != null)
                           if (lastSeenAt != null && !isOnline!)
                             StreamBuilder<DateTime>(

@@ -125,13 +125,13 @@ class AddCommentsRequested extends PostEvent {
   final String comments;
   final String? replyto;
   final String postId;
-  final bool? hiddenflag;
+  final bool hiddenflag;
 
   const AddCommentsRequested(
       {required this.comments,
       required this.postId,
       this.replyto,
-      this.hiddenflag});
+    required  this.hiddenflag});
 
   @override
   List<Object?> get props => [comments, postId, replyto];

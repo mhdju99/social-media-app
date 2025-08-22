@@ -68,6 +68,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       required String country,
       required String city,
       required String gender,
+       String? bio,
 
       required List<String> preferredTopics}) async {
     try {
@@ -82,6 +83,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         password: password,
         country: country,
         city: city,
+        bio: bio,
         preferredTopics: preferredTopics,
       );
       return Right(userModel.toEntity());

@@ -80,7 +80,7 @@ class RealtimeDataSourceImpl implements RealtimeDataSource {
 
     _socket.onConnect((_) {
       _isConnected = true;
-      print('✅ Connected to socket server');
+      print('✅ Connected to socket server $token');
       print("qqqqqqqqqqqqqqq");
       _socket.emit('connected', {'token': token});
     });
@@ -153,8 +153,8 @@ class RealtimeDataSourceImpl implements RealtimeDataSource {
 
   @override
   void disconnect() {
-    if (_isConnected) {
-      _socket.disconnect();
-    }
+     _socket.disconnect();
+      _socket.destroy();
+      _socket.dispose();
   }
 }

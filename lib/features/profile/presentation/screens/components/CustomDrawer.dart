@@ -10,6 +10,8 @@ import 'package:social_media_app/features/authentication/presentation/screens/sp
 import 'package:social_media_app/features/profile/domain/entities/user_entity.dart';
 import 'package:social_media_app/features/profile/presentation/blocs/profile_bloc.dart';
 import 'package:social_media_app/features/profile/presentation/screens/blockUsersPage.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_bloc.dart';
+import 'package:social_media_app/features/realtime/presentation/blocs/chat_event.dart';
 
 class CustomDrawer extends StatelessWidget {
   final UserProfile? user;
@@ -99,10 +101,14 @@ class CustomDrawer extends StatelessWidget {
                     style: TextStyle(color: Colors.red),
                   ),
                   onTap: () {
+                          print("✅dis✅");
+
+                                  context.read<ChatBloc>().add(disConnectToSocketEvent());
+
                     context.read<AuthenticationBloc>().add(LogOutRequested());
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                          builder: (context) => const SplashScreen()),
+                          builder: (context) =>  SplashScreen()),
                       (route) => false,
                     );
                   },

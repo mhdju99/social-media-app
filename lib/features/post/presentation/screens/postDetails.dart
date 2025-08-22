@@ -178,11 +178,12 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               Card(
                 elevation: 3,
                 child: ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded,
-                      color: Colors.red),
+                  leading: const Icon(Icons.person_off, color: Colors.black),
                   title: const Text(
                     "add anonymous comment",
-                    style: TextStyle(fontSize: 14, color: Colors.red),
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
                   ),
                   onTap: () async {
                     final text = commentController.text;
@@ -541,6 +542,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
 
                                     context.read<PostBloc>().add(
                                         AddCommentsRequested(
+                                          hiddenflag: false,
                                             comments: text,
                                             postId: widget.postid,
                                             replyto: null));
@@ -622,13 +624,12 @@ class PostImagesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int total = imageUrls.length;
-    final String imageUrl =
-        "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[0]}&postId=$postId";
 
     if (total == 1) {
       return InkWell(
         onTap: () {
-          showFullImage(context, imageUrl);
+          showFullImage(context,
+              "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[0]}&postId=$postId");
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -637,7 +638,9 @@ class PostImagesGrid extends StatelessWidget {
             height: 200,
             child: Image(
               fit: BoxFit.cover,
-              image: Image.network(imageUrl).image,
+              image: Image.network(
+                      "${EndPoints.baseUrl}/posts/get-file?filesName=${imageUrls[0]}&postId=$postId")
+                  .image,
             ),
           ),
         ),

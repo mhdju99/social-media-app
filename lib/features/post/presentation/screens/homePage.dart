@@ -168,7 +168,7 @@ class _HomepageState extends State<Homepage>
                       showSearch(
                           context: context,
                           delegate: PersonSearchDelegate(
-                              SearchBloc(sl<SearchRepository>())));
+                            sl<SearchBloc> ()));
                     },
                   ),
                   actions: [

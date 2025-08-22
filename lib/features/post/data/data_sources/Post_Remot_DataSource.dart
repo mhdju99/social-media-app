@@ -185,10 +185,11 @@ class PostRemotDataSourceImpl implements PostRemotDataSource {
         queryParameters: {"postId": postId});
 
     Map<String, dynamic> resposneData = response.data;
+        print("}}}${resposneData}");
+
     PostDetailsModel postModel = PostDetailsModel.fromResponse(resposneData);
-    print("}}}${postModel.comments}");
+    print("}}}${postModel.comments.toString()}");
     debugPrint("❤💞");
-    debugPrint(postModel.comments.toString());
     return postModel;
   }
 

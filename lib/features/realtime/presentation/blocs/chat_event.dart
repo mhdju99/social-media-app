@@ -13,7 +13,14 @@ class ConnectToSocketEvent extends ChatEvent {
   // @override
   // List<Object?> get props => [token];
 }
+class disConnectToSocketEvent extends ChatEvent {
+  // final String token;
 
+  // ConnectToSocketEvent(this.token);
+
+  // @override
+  // List<Object?> get props => [token];
+}
 class SendMessageEvent extends ChatEvent {
   final String to;
   final String content;

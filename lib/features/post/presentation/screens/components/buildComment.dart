@@ -7,6 +7,8 @@ import 'package:social_media_app/core/utils/post_helper.dart';
 import 'package:social_media_app/features/post/domian/entities/comment_entity.dart';
 import 'package:social_media_app/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_media_app/features/post/presentation/screens/replysPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/myProfailPage.dart';
+import 'package:social_media_app/features/profile/presentation/screens/userProfailPage.dart';
 import 'package:social_media_app/features/user_tracking/tracker_bloc.dart';
 
 class buildComment extends StatefulWidget {
@@ -28,7 +30,7 @@ class _buildCommentState extends State<buildComment> {
   @override
   Widget build(BuildContext context) {
     final comment = widget.comment;
-        print("XZX${comment.hiddenFlag}");
+    print("XZX${comment.hiddenFlag}");
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -40,16 +42,37 @@ class _buildCommentState extends State<buildComment> {
             children: [
               Column(
                 children: [
-                  CircleAvatar(
-                    backgroundImage:
-                    (comment.hiddenFlag==false)?    (comment.user.profileImage.isNotEmpty)
-                        ? NetworkImage(
-                            "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${comment.user.profileImage}",
-                          )
-                        : const AssetImage("assets/images/default_avatar.png"):const AssetImage("assets/images/anonymous-user.png"),
-                 
-                    // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
-                    radius: 20,
+                  InkWell(
+                    onTap: () {
+                      if (comment.hiddenFlag == true) {
+                        return;
+                      }
+                      if (comment.isMyComment!) {
+                        final result = Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const ProfileScreen()),
+                        );
+                        return;
+                      }
+                      final result = Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                UserProfileScreen(userId: comment.user.id)),
+                      );
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: (comment.hiddenFlag == false)
+                          ? NetworkImage(
+                              "${EndPoints.baseUrl}/users/profile-image?profileImagePath=${comment.user.profileImage}",
+                            )
+                          : const AssetImage(
+                              "assets/images/anonymous-user.png"),
+
+                      // backgroundImage: (!comment.hiddenFlag)?: AssetImage("assets/images/anonymous-user.png"),
+                      radius: 20,
+                    ),
                   ),
                   Visibility(
                     visible: widget.comment.repliedBy.isNotEmpty,
@@ -89,11 +112,20 @@ class _buildCommentState extends State<buildComment> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text((comment.hiddenFlag==true)?"Anonymous user"
-                                  :comment.user.userName,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                (comment.hiddenFlag == true &&
+                                        comment.isMyComment!)
+                                    ? Text(
+                                        "${comment.user.userName} (Anonymous)",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    : Text(
+                                        (comment.hiddenFlag == true)
+                                            ? "Anonymous user"
+                                            : comment.user.userName,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                 Text(formatPostTime(widget.comment.createdAt),
                                     style: TextStyle(
                                         color: Colors.grey[500], fontSize: 12))
@@ -130,7 +162,10 @@ class _buildCommentState extends State<buildComment> {
                                 comment.isLiked ? Colors.red : Colors.grey[500],
                           ),
                         ),
-                        Text(comment.likesCount !=0?comment.likesCount.toString():'',
+                        Text(
+                            comment.likesCount != 0
+                                ? comment.likesCount.toString()
+                                : '',
                             style: TextStyle(color: Colors.grey[600])),
                         const SizedBox(width: 12),
                         InkWell(

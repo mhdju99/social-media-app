@@ -377,8 +377,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             final updatedComments = List<Comment>.from(post.comments)
               ..add(Comment(
                   likesCount: 0,
-                  hiddenFlag: false,
+                  hiddenFlag:event.hiddenflag ? true:false,
                   id: comment["comment"],
+                  isMyComment: true,
                   content: event.comments,
                   user: userModel
                       .toEntity(), // ثم استدعاء toEntity() لتحويله إلى كائن User
@@ -407,6 +408,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             final updatedComments = List<Comment>.from(post!)
               ..add(Comment(
                   likesCount: 0,
+                  isMyComment: true,
+                                    hiddenFlag:event.hiddenflag ? true:false,
+
                   id: comment["comment"],
                   content: event.comments,
                   user: userModel

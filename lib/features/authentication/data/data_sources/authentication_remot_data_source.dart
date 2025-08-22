@@ -29,14 +29,14 @@ abstract class AuthenticationRemotDataSource {
     required String password,
     required String country,
     required String city,
+    String? bio,
     required String gender,
     required List<String> preferredTopics,
   });
   Future<void> requestResetCode(String email);
   Future<String> verifyResetCode({required String email, required String code});
   Future<void> addProfileImage({required File file});
-  Future<void> resetPassword(
-      { required String newPassword});
+  Future<void> resetPassword({required String newPassword});
   Future<void> resetEmail({required String newemail});
 
   Future<void> ChosePreferredTopics({required String Topic});
@@ -101,8 +101,9 @@ class AuthenticationRemotDataSourceImpl
       required String country,
       required String city,
       required String gender,
+      String? bio,
       required List<String> preferredTopics}) async {
-    Response resposne = await api.post(await EndPoints.registerEndPoint, data: {
+    final Map<String, dynamic> data = {
       "userName": userName,
       "certifiedDoctor": certifiedDoctor,
       "firstName": firstName,
@@ -112,7 +113,11 @@ class AuthenticationRemotDataSourceImpl
       "location": {"country": country, "city": city},
       "preferredTopics": preferredTopics,
       "gender": gender,
-    }, header: {
+    };
+    if (bio != null) data['about'] = bio;
+    print("⭕$data");
+    Response resposne =
+        await api.post(await EndPoints.registerEndPoint, data: data, header: {
       "password": password,
     });
     Map<String, dynamic> resposneData = resposne.data;
@@ -136,19 +141,13 @@ class AuthenticationRemotDataSourceImpl
       await EndPoints.requestResetCodeEndPoint,
       queryParameters: {"email": email},
     );
-    
-
-
-
   }
 
   @override
-  Future<void> resetPassword(
-      { required String newPassword}) async {
- await api.put(
+  Future<void> resetPassword({required String newPassword}) async {
+    await api.put(
       await EndPoints.changePasswordEndPoint,
       data: {"newPassword": newPassword},
-     
     );
     // print("💤$res");
   }
@@ -193,17 +192,16 @@ class AuthenticationRemotDataSourceImpl
       header: {
         "code": code,
       },
-
     );
-        print("💌$resposne");
+    print("💌$resposne");
 
     final token = resposne.headers.value('Authorization');
-            print("🉑🉑$token");
+    print("🉑🉑$token");
 
     if (token == null) {
       throw Exception('Authorization token not found in response headers');
     }
-        await local.saveTokenSec(token);
+    await local.saveTokenSec(token);
 
     return token;
   }

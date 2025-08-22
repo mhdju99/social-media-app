@@ -229,6 +229,13 @@ class UserProfileScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   onPressed: () {
                     // تنفيذ عملية المتابعة (تابع من خلال bloc أو API حسب نظامك)
                     // مثال:
@@ -243,6 +250,13 @@ class UserProfileScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -265,7 +279,7 @@ class UserProfileScreen extends StatelessWidget {
 
   Widget _buildPostGrid(UserProfile user, bool isReel) {
     final filteredPosts =
-        user.posts.where((post) => post.reelFlag == isReel).toList();
+        user.posts.where((post) => post.reelFlag == isReel&& post.images.isNotEmpty).toList();
 
     if (filteredPosts.isEmpty) {
       return const Center(child: Text("No posts found"));

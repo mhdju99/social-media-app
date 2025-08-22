@@ -33,6 +33,7 @@ class _SignUPState extends State<SignUP> {
   String? password;
   String? country;
   String? city;
+  String? bio;
 
   DateTime? birthDate;
   bool? certifiedDoctor = false;
@@ -158,13 +159,13 @@ class _SignUPState extends State<SignUP> {
                 label: "Birth Date",
                 onSaved: (date) => birthDate = date,
                 validator: (date) =>
-                    date == null ? 'يرجى اختيار تاريخ الميلاد' : null,
+                    date == null ? 'Please choose a Date' : null,
               ),
               const SizedBox(
                 height: 9,
               ),
               DoctorPatientSelector(
-                items: {"male": Icons.male, " female": Icons.female
+                items: {"male": Icons.male, "female": Icons.female
                 },
                 // title: "user type:",
                 // initialValue: certifiedDoctor,
@@ -194,8 +195,18 @@ class _SignUPState extends State<SignUP> {
                 },
                 validate: Validators.validateGeneral,
               ),
+               SizedBox(
+                height: 9,
+              ),
+              CustomTextField(
+                prefixIcon: const Icon(Icons.badge_outlined),
+                text: "bio",
+                onSave: (val) {
+                  bio = val;
+                },)
             ],
           ),
+          
           const SizedBox(
             height: 30,
           ),
@@ -292,6 +303,7 @@ class _SignUPState extends State<SignUP> {
                         params: RegisterParams(
                             certifiedDoctor: certifiedDoctor!,
                             firstName: firstName!,
+                            bio: bio,
                             userName: userName!,
                             lastName: lastName!,
                             birthDate: birthDate!.toIso8601String(),

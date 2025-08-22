@@ -19,6 +19,7 @@ import 'package:social_media_app/features/realtime/data/data_sources/realtime_da
 import 'package:social_media_app/features/realtime/data/repositories/realtime_repository_impl.dart';
 import 'package:social_media_app/features/realtime/domain/repositories/realtime_repository.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/connect_to_socket.dart';
+import 'package:social_media_app/features/realtime/domain/usecases/disconnect_socket.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_All_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_message_stream.dart';
@@ -48,6 +49,7 @@ Future<void> init4() async {
       userOnlineStream: sl() ,
       getUserIdUseCase: sl() ,
       checkLoginStatusUseCase: sl() ,
+      disconnectSocket: sl()
 
 
 
@@ -68,6 +70,7 @@ if (!sl.isRegistered<GetUserIdUseCase>()) {
     sl.registerLazySingleton(() => CheckAuthStatusUseCase(sl()));
   }
 
+  sl.registerLazySingleton(() => DisconnectSocket (sl()));
 
 
   sl.registerLazySingleton<RealtimeRepository>(
@@ -90,7 +93,8 @@ if (!sl.isRegistered<GetUserIdUseCase>()) {
   );
   
   sl.registerFactory(
-    () => SearchBloc(sl()),
+    () => SearchBloc(getUserIdUseCase: sl(),
+    repository: sl()),
   );
 
   sl.registerLazySingleton<SearchRepository>(

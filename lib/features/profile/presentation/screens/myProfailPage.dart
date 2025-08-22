@@ -234,7 +234,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildPostGrid(UserProfile user, bool isReel) {
     final filteredPosts =
-        user.posts.where((post) => post.reelFlag == isReel).toList();
+        user.posts.where((post) => post.reelFlag == isReel&&post.images.isNotEmpty).toList();
 
     if (filteredPosts.isEmpty) {
       return const Center(child: Text("No posts found"));

@@ -27,7 +27,7 @@ class CommentModel {
     print("VBV$json");
     return CommentModel(
       id: json['_id'],
-      hiddenFlag: json['hiddenFlag'] ,
+      hiddenFlag: json['hiddenFlag']??true ,
       content: json['content'],
       user: UserModel.fromJson(json['user']),
       repliedBy: List<String>.from(json['repliedBy']),
@@ -52,10 +52,6 @@ class CommentModel {
     );
   }
 
-  @override
-  String toString() {
-    return 'CommentModel(hiden : $hiddenFlag,id: $id, content: $content, user: $user, repliedBy: $repliedBy, repliedTo: $repliedTo, likedBy: $likedBy, createdAt: $createdAt)';
-  }
 
   CommentModel copyWith({
     String? id,
@@ -75,5 +71,10 @@ class CommentModel {
       likedBy: likedBy ?? this.likedBy,
       createdAt: createdAt ?? this.createdAt,
     );
+  }
+
+  @override
+  String toString() {
+    return 'CommentModel(id: $id, content: $content, user: $user, repliedBy: $repliedBy, repliedTo: $repliedTo, likedBy: $likedBy, createdAt: $createdAt, hiddenFlag: $hiddenFlag)';
   }
 }

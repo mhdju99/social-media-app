@@ -12,8 +12,10 @@ class RegisterParams {
   final String country;
   final String city;
   final String gender;
+  final String? bio;
   final List<String> preferredTopics;
-  RegisterParams({
+  RegisterParams( {
+    this.bio,
     required this.certifiedDoctor,
     required this.firstName,
     required this.userName,

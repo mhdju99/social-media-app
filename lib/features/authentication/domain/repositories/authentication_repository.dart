@@ -25,6 +25,7 @@ abstract class AuthenticationRepository {
     required String password,
     required String country,
     required String city,
+     String? bio,
     required List<String> preferredTopics,
   });
   Future<void> logOut();

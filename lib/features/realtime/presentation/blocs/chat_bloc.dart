@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/GetUserIdUseCase.dart';
 import 'package:social_media_app/features/authentication/domain/usecases/check_auth_status_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/connect_to_socket.dart';
+import 'package:social_media_app/features/realtime/domain/usecases/disconnect_socket.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_All_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_chat_usecase.dart';
 import 'package:social_media_app/features/realtime/domain/usecases/get_message_stream.dart';
@@ -17,6 +18,7 @@ import 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ConnectToSocketUseCase connectToSocket;
+  final DisconnectSocket disconnectSocket;
   final SendMessageUseCase sendMessage;
   final GetMessageStreamUseCase getMessageStream;
   final GetChatUseCase getChatUseCase;
@@ -42,8 +44,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.getMessageStream,
     required this.getAllChatUsecase,
     required this.checkLoginStatusUseCase,
+    required this.disconnectSocket,
   }) : super(ChatInitial()) {
     on<ConnectToSocketEvent>(_onConnectToSocket);
+    on<disConnectToSocketEvent>(_ondisConnectToSocket);
     on<SendMessageEvent>(_onSendMessage);
     on<MessageReceivedEvent>(_onMessageReceived);
     on<GetChatEvent>(_onGetChat);
@@ -77,9 +81,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       ConnectToSocketEvent event,
       Emitter<ChatState> emit) async {
+              print("✅bloc✅");
+
     final result = await checkLoginStatusUseCase();
 
     await connectToSocket(result['token']);
+    emit(ChatConnected());
+  }
+  Future<void> _ondisConnectToSocket(
+      // TODO: التعامل مع الأخطاء بشكل أفضل هنا
+
+      disConnectToSocketEvent event,
+      Emitter<ChatState> emit) async {
+
+    disconnectSocket();
     emit(ChatConnected());
   }
 

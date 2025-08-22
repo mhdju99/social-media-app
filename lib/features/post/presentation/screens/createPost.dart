@@ -286,8 +286,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               ),
                               onPressed: () {
                                 if (_selectedTopic.isNotEmpty &&
-                                    _postController.text.isNotEmpty &&
-                                    _mediaFiles.isNotEmpty) {
+                                        _postController.text.isNotEmpty
+                                    // &&
+                                    // _mediaFiles.isNotEmpty
+                                    ) {
                                   context.read<PostBloc>().add(
                                         CreatePostRequested(
                                           hiddenFlag: false,
@@ -314,7 +316,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           Expanded(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal.shade800,
+                                backgroundColor: Colors.teal,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -322,12 +324,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               ),
                               onPressed: () {
                                 if (_selectedTopic.isNotEmpty &&
-                                    _postController.text.isNotEmpty &&
-                                    _mediaFiles.isNotEmpty) {
+                                    _postController.text.isNotEmpty ) {
                                   context.read<PostBloc>().add(
                                         CreatePostRequested(
-                                                                                    hiddenFlag: true,
-
+                                          hiddenFlag: true,
                                           topic: _selectedTopic,
                                           description: _postController.text,
                                           images: _mediaFiles,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:social_media_app/core/constants/end_points.dart';
@@ -73,11 +74,14 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey, // ✅ مهم جداً
       debugShowCheckedModeBanner: false,
       
-      title: 'Flutter Demo',
+      title: 'Neurest',
       theme: ThemeData(
+         textTheme: GoogleFonts.poppinsTextTheme(
+          Theme.of(context).textTheme, // ⬅️ كل النصوص تستخدم Poppins
+        ),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      home:  SplashScreen(),
     );
   }
 }
